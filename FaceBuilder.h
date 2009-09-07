@@ -17,8 +17,13 @@ class FaceBuilder {
     
     
 public:
-    static FaceSet* MakeABox(Vector<3,float> origin, Vector<3,float> size);
-    static FaceSet* MakeABox(float w, float d, float h);
+    
+    struct FaceState {
+        Vector<4,float> color;    
+    };
+    
+    static void MakeABox(FaceSet* fs, FaceState state, Vector<3,float> origin, Vector<3,float> size);    
+    static void AddSquare(FaceSet* fs, FaceState state, Vector<3,float>,Vector<3,float>,Vector<3,float>,Vector<3,float>);
 
 private:
     FaceSet *fs;

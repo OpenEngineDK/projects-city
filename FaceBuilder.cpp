@@ -20,7 +20,7 @@ void FaceBuilder::AddSquare(Vector<3,float> a, Vector<3,float> b,
 
     Face *f1 = new Face(a,b,c);
     
-    Vector<3,float> norm = (b-a) % (c-a);
+    Vector<3,float> norm = (c-a) % (b-a);
     norm.Normalize();
     
     f1->norm[0] = norm;
@@ -49,50 +49,80 @@ void FaceBuilder::AddSquare(Vector<3,float> a, Vector<3,float> b,
     
 }
 
+void FaceBuilder::AddSquare(FaceSet* fs, FaceState state,
+                            Vector<3,float> a, Vector<3,float> b,
+                            Vector<3,float> c, Vector<3,float> d) {
+    
+    Face *f1 = new Face(a,b,c);
+    
+    Vector<3,float> norm = (c-a) % (b-a);
+    norm.Normalize();
+    
+    f1->norm[0] = norm;
+    f1->norm[1] = norm;
+    f1->norm[2] = norm;
+    
+    f1->colr[0] = state.color;
+    f1->colr[1] = state.color;
+    f1->colr[2] = state.color;
+    //f1->mat = MaterialPtr(mat);
+    
+    fs->Add(FacePtr(f1));
+    
+    Face *f2 = new Face(a,c,d);
+    f2->colr[0] = state.color;
+    f2->colr[1] = state.color;
+    f2->colr[2] = state.color;
+    
+    f2->norm[0] = norm;
+    f2->norm[1] = norm;
+    f2->norm[2] = norm;
+    
+    //f2->mat = MaterialPtr(mat);
+    
+    fs->Add(FacePtr(f2));
+    
+}
+
+
 FaceSet* FaceBuilder::GetFaceSet() {
     return fs;
 }
 
-FaceSet* FaceBuilder::MakeABox(Vector<3,float> origin, Vector<3,float> size) {
+void FaceBuilder::MakeABox(FaceSet* fs, FaceState state, Vector<3,float> origin, Vector<3,float> size) {
     
-    float width = size.Get(0);
-    float depth = size.Get(1);
-    float height = size.Get(2);
+    float width = size.Get(0)/2;
+    float depth = size.Get(1)/2;
+    float height = size.Get(2)/2;
     
     float x = origin.Get(0);
     float y = origin.Get(1);
     float z = origin.Get(2);
     
-    FaceBuilder fb;    
-    fb.colr = Vector<4,float>(1,0,0,0);
+
     
     //fb.mat->specular = Vector<4,float>(.3,.3,.3,1);
     //fb.mat->shininess = 1;
     
-    Vector<3,float> a = Vector<3,float>(x,y,z);
-    Vector<3,float> b = Vector<3,float>(x,height,z);
-    Vector<3,float> c = Vector<3,float>(width,height,z);
-    Vector<3,float> d = Vector<3,float>(width,y,z);
-    Vector<3,float> e = Vector<3,float>(width,height,-depth);
-    Vector<3,float> f = Vector<3,float>(width,y,-depth);
-    Vector<3,float> g = Vector<3,float>(x,height,-depth);
-    Vector<3,float> h = Vector<3,float>(x,y,-depth);
+    Vector<3,float> a = Vector<3,float>(x-width,y-height,z+depth);
+    Vector<3,float> b = Vector<3,float>(x-width,y+height,z+depth);
+    Vector<3,float> c = Vector<3,float>(x+width,y+height,z+depth);
+    Vector<3,float> d = Vector<3,float>(x+width,y-height,z+depth);
+    Vector<3,float> e = Vector<3,float>(x+width,y+height,z-depth);
+    Vector<3,float> f = Vector<3,float>(x+width,y-height,z-depth);
+    Vector<3,float> g = Vector<3,float>(x-width,y+height,z-depth);
+    Vector<3,float> h = Vector<3,float>(x-width,y-height,z-depth);
     
     
     
-    fb.AddSquare( a, b, c, d);
-    fb.AddSquare( d, c, e, f);
+    AddSquare(fs, state, a, b, c, d);
+    AddSquare(fs, state, d, c, e, f);
     
-    fb.AddSquare( f, e, g, h);
-    fb.AddSquare( h, g, b, a);
+    AddSquare(fs, state, f, e, g, h);
+    AddSquare(fs, state, h, g, b, a);
     
-    fb.AddSquare( c, b, g, e);
-    fb.AddSquare( a, h, f, d);
-    
-    
-    return fb.GetFaceSet();
+    AddSquare(fs, state, c, b, g, e);
+    AddSquare(fs, state, h, a, d, f);
 }
 
-FaceSet* FaceBuilder::MakeABox(float width, float depth, float height) {
-    return MakeABox(Vector<3,float>(0,0,0),Vector<3,float>(width,depth,height));
-}
+

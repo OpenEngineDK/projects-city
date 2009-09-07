@@ -9,6 +9,14 @@ SET( PROJECT_SOURCES
   FaceBuilder.h
   FaceBuilder.cpp
   RenderStateHandler.h
+  City.cpp
+  City.h
+  CityGrid.cpp
+  CityGrid.h
+  Building.cpp
+  Building.h
+  CiyAnimator.cpp
+  CiyAnimator.h
 )
 
 # Include needed to use SDL under Mac OS X

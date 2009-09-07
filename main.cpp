@@ -23,6 +23,14 @@
 #include <Utils/MoveHandler.h>
 #include "FaceBuilder.h"
 #include "RenderStateHandler.h"
+#include "City.h"
+#include "CityAnimator.h"
+
+#include <Utils/FPSSurface.h>
+#include <Display/InterpolatedViewingVolume.h>
+#include <Display/PerspectiveViewingVolume.h>
+
+#include <Scene/VertexArrayTransformer.h>
 
 // Game factory
 //#include "GameFactory.h"
@@ -33,6 +41,7 @@
 using namespace OpenEngine::Logging;
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Utils;
+using namespace OpenEngine::Display;
 
 using namespace OpenEngine::Geometry;
 
@@ -43,22 +52,27 @@ using namespace OpenEngine::Geometry;
  * method in Java.
  */
 int main(int argc, char** argv) {
-    // Setup logging facilities.
-    Logger::AddLogger(new StreamLogger(&std::cout));
 
+    SimpleSetup* setup = new SimpleSetup("Example Project Title");
+    
     // Print usage info.
     logger.info << "========= Running OpenEngine Test Project =========" << logger.end;
-
-    // Create simple setup
-    SimpleSetup* setup = new SimpleSetup("Example Project Title");
     
     // make something to display.
     
-    GeometryNode *node = new GeometryNode(FaceBuilder::MakeABox(10,20,30));
+    //PerspectiveViewingVolume *persp = new PerspectiveViewingVolume();
+    //persp->SetFOV(PI/1.1);
+    //setup->SetCamera(*(new InterpolatedViewingVolume(*(setup->GetCamera()),1)));
+    
+    City* c = new City();
+    
+    
+    ISceneNode* node = c->GetNode();
     
     RenderStateNode *rsn = new RenderStateNode();
     
-    rsn->EnableOption(RenderStateNode::LIGHTING);
+    rsn->ToggleOption(RenderStateNode::LIGHTING);
+    rsn->ToggleOption(RenderStateNode::COLOR_MATERIAL);
     
     TransformationNode *lightTrans = new TransformationNode();
     lightTrans->Move(0, 50, 50);
@@ -74,10 +88,36 @@ int main(int argc, char** argv) {
     root->AddNode(node);
     setup->GetScene()->RemoveAllNodes();
     setup->GetScene()->AddNode(root);
+    
+    // Transform the scene to use vertex arrays
+    VertexArrayTransformer vaT;
+    vaT.Transform(*(setup->GetScene()));
+    
 
-    setup->GetCamera()->SetPosition(Vector<3,float>(30,50,40));
-    setup->GetCamera()->LookAt(0, 15, 0);
-
+    //setup->GetCamera()->SetPosition(Vector<3,float>(0,500,0));
+    //setup->GetCamera()->LookAt(0, 0, 0);
+    //setup->GetCamera()->SetPosition(Vector<3,float>(10,10,10));
+    
+    // DAS DOT!
+    
+    Vector<2,float> cross = c->GetGrid()->PositionForCrossing(3,3);
+    
+    TransformationNode* dotTrans = new TransformationNode();
+    dotTrans->SetPosition(Vector<3,float>(cross[0],0,cross[1]));
+    
+    FaceBuilder::FaceState st;
+    st.color=Vector<4,float>(1,1,0,1);
+    FaceSet* fs = new FaceSet();
+    FaceBuilder::MakeABox(fs, st, 
+                          Vector<3,float>(),
+                          Vector<3,float>(10,10,10));
+    GeometryNode* dot = new GeometryNode(fs);
+    dotTrans->AddNode(dot);
+    
+    CityAnimator *an = new CityAnimator(c,setup->GetCamera(),dotTrans);    
+    setup->GetEngine().ProcessEvent().Attach(*an);
+    setup->GetScene()->AddNode(dotTrans);
+    
     // handlers
     MoveHandler *move = new MoveHandler(*setup->GetCamera(),
                                         setup->GetMouse());
@@ -88,6 +128,11 @@ int main(int argc, char** argv) {
     setup->GetEngine().ProcessEvent().Attach(*move);
     setup->GetKeyboard().KeyEvent().Attach(*move);
     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(rsn)));
+    setup->GetJoystick().JoystickAxisEvent().Attach(*move);
+    
+    setup->ShowFPS();
+    
+    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
     
     setup->GetEngine().Start();
 
