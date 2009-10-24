@@ -8,7 +8,7 @@
  */
 
 #include "Building.h"
-#include "FaceBuilder.h"
+#include <Geometry/FaceBuilder.h>
 
 
 Building::Building(Vector <2,float> pos, RandomGenerator* rg) : pos(pos), rg(rg) {

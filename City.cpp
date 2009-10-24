@@ -8,7 +8,7 @@
  */
 
 #include "City.h"
-#include "FaceBuilder.h"
+#include <Geometry/FaceBuilder.h>
 #include <Math/RandomGenerator.h>
 #include <Scene/TransformationNode.h>
 #include "Building.h"

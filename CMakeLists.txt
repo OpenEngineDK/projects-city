@@ -6,8 +6,6 @@ SET( PROJECT_NAME "city")
 SET( PROJECT_SOURCES
   # Add all the cpp source files here
   main.cpp
-  FaceBuilder.h
-  FaceBuilder.cpp
   RenderStateHandler.h
   City.cpp
   City.h
@@ -15,8 +13,8 @@ SET( PROJECT_SOURCES
   CityGrid.h
   Building.cpp
   Building.h
-  CiyAnimator.cpp
-  CiyAnimator.h
+  CityAnimator.cpp
+  CityAnimator.h
 )
 
 # Include needed to use SDL under Mac OS X
@@ -41,4 +39,6 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   Extensions_SDL
   Extensions_SetupHelpers
   Extensions_GenericHandlers
+  Extensions_FaceBuilder
+  Extensions_TinyScheme
 )

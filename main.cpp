@@ -21,7 +21,7 @@
 // SimpleSetup
 #include <Utils/SimpleSetup.h>
 #include <Utils/MoveHandler.h>
-#include "FaceBuilder.h"
+#include <Geometry/FaceBuilder.h>
 #include "RenderStateHandler.h"
 #include "City.h"
 #include "CityAnimator.h"
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
     //setup->SetCamera(*(new InterpolatedViewingVolume(*(setup->GetCamera()),1)));
     
     City* c = new City();
-    
+
     
     ISceneNode* node = c->GetNode();
     
@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
     //move->nodes.push_back(lightTrans);
     // Start the engine.
     setup->GetEngine().InitializeEvent().Attach(*move);
-    setup->GetEngine().ProcessEvent().Attach(*move);
+    //setup->GetEngine().ProcessEvent().Attach(*move);
     setup->GetKeyboard().KeyEvent().Attach(*move);
     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(rsn)));
     setup->GetJoystick().JoystickAxisEvent().Attach(*move);

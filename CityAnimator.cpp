@@ -42,15 +42,15 @@ void CityAnimator::Handle(ProcessEventArg arg) {
         trans->SetPosition(lookPos);
         camera->SetPosition(camPos);
         camera->LookAt(lookPos);
-
-        
-        
         
         logger.info << "one sec" << logger.end;
     } else {
         Vector<3,float> dir =  lookPos - camPos;
-        camPos += dir*0.001;
-        camera->SetPosition(camPos);
+        
+        //logger.info << t.GetElapsedIntervals(100000)/50.0 << logger.end;
+        
+        Vector<3,float> currentPos = camPos + dir*t.GetElapsedIntervals(10000)/500.0;
+        camera->SetPosition(currentPos);
     }
     
 }
