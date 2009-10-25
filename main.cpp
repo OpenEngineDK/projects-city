@@ -29,8 +29,10 @@
 #include <Utils/FPSSurface.h>
 #include <Display/InterpolatedViewingVolume.h>
 #include <Display/PerspectiveViewingVolume.h>
+#include <Display/TrackingCamera.h>
 
 #include <Scene/VertexArrayTransformer.h>
+#include <Script/Scheme.h>
 
 // Game factory
 //#include "GameFactory.h"
@@ -45,6 +47,8 @@ using namespace OpenEngine::Display;
 
 using namespace OpenEngine::Geometry;
 
+using namespace OpenEngine::Script;
+
 /**
  * Main method for the first quarter project of CGD.
  * Corresponds to the
@@ -54,7 +58,8 @@ using namespace OpenEngine::Geometry;
 int main(int argc, char** argv) {
 
     SimpleSetup* setup = new SimpleSetup("Example Project Title");
-    
+    setup->AddDataDirectory("projects/city/data/");
+
     // Print usage info.
     logger.info << "========= Running OpenEngine Test Project =========" << logger.end;
     
@@ -62,9 +67,18 @@ int main(int argc, char** argv) {
     
     //PerspectiveViewingVolume *persp = new PerspectiveViewingVolume();
     //persp->SetFOV(PI/1.1);
-    //setup->SetCamera(*(new InterpolatedViewingVolume(*(setup->GetCamera()),1)));
+    
+    TrackingCamera *trackingCam = new TrackingCamera(*(new PerspectiveViewingVolume));
+    
+    setup->SetCamera(*trackingCam);
     
     City* c = new City();
+    Scheme *s = new Scheme();
+    s->AddFileToAutoLoad("init.scm");
+    s->AddFileToAutoLoad("oe-init.scm");
+    s->AddFileToAutoLoad("test.scm");
+    //s->EvalAndPrint("(display (+ 1 2))");
+    setup->GetEngine().ProcessEvent().Attach(*s);
 
     
     ISceneNode* node = c->GetNode();
@@ -94,13 +108,13 @@ int main(int argc, char** argv) {
     vaT.Transform(*(setup->GetScene()));
     
 
-    //setup->GetCamera()->SetPosition(Vector<3,float>(0,500,0));
-    //setup->GetCamera()->LookAt(0, 0, 0);
+    setup->GetCamera()->SetPosition(Vector<3,float>(0,500,0));
+    setup->GetCamera()->LookAt(0, 0, 0);
     //setup->GetCamera()->SetPosition(Vector<3,float>(10,10,10));
     
     // DAS DOT!
     
-    Vector<2,float> cross = c->GetGrid()->PositionForCrossing(3,3);
+    Vector<2,float> cross = c->GetGrid()->PositionForCrossing(0,0);
     
     TransformationNode* dotTrans = new TransformationNode();
     dotTrans->SetPosition(Vector<3,float>(cross[0],0,cross[1]));
@@ -113,9 +127,11 @@ int main(int argc, char** argv) {
                           Vector<3,float>(10,10,10));
     GeometryNode* dot = new GeometryNode(fs);
     dotTrans->AddNode(dot);
+    trackingCam->Follow(dotTrans);
+    s->DefinePointer("dot-tn",dotTrans);
     
-    CityAnimator *an = new CityAnimator(c,setup->GetCamera(),dotTrans);    
-    setup->GetEngine().ProcessEvent().Attach(*an);
+//    CityAnimator *an = new CityAnimator(c,setup->GetCamera(),dotTrans);    
+//    setup->GetEngine().ProcessEvent().Attach(*an);
     setup->GetScene()->AddNode(dotTrans);
     
     // handlers
