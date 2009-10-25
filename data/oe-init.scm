@@ -15,6 +15,7 @@
 (define process (lambda (n)
 	(display n)
 	(display "\n")
-	(apply-process n)
+		;(apply-process n)
+		(test n)
 	))
 

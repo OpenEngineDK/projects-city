@@ -33,6 +33,7 @@
 
 #include <Scene/VertexArrayTransformer.h>
 #include <Script/Scheme.h>
+#include <Script/ScriptBridge.h>
 
 // Game factory
 //#include "GameFactory.h"
@@ -128,7 +129,13 @@ int main(int argc, char** argv) {
     GeometryNode* dot = new GeometryNode(fs);
     dotTrans->AddNode(dot);
     trackingCam->Follow(dotTrans);
-    s->DefinePointer("dot-tn",dotTrans);
+    
+    ScriptBridge::AddHandler<TransformationNode>(new TransformationNodeHandler());
+    ScriptBridge::AddHandler<Vector<3,float> >(new VectorHandler());
+    
+    sbo sb = ScriptBridge::CreateSboPointer<TransformationNode>(dotTrans);
+    
+    s->DefineSbo("dot-tn",sb);
     
 //    CityAnimator *an = new CityAnimator(c,setup->GetCamera(),dotTrans);    
 //    setup->GetEngine().ProcessEvent().Attach(*an);
