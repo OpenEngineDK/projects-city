@@ -36,7 +36,7 @@
 #include <Script/ScriptBridge.h>
 
 // Game factory
-//#include "GameFactory.h"
+#include "Echo.h"
 
 // name spaces that we will be using.
 // this combined with the above imports is almost the same as
@@ -157,6 +157,13 @@ int main(int argc, char** argv) {
     
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
     
+
+    // Echo Client
+
+    Echo* e = new Echo("localhost",8899);
+
+    setup->GetEngine().ProcessEvent().Attach(*e);
+
     setup->GetEngine().Start();
 
     // Return when the engine stops.

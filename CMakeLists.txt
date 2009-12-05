@@ -15,6 +15,8 @@ SET( PROJECT_SOURCES
   Building.h
   CityAnimator.cpp
   CityAnimator.h
+  Echo.h
+  Echo.cpp
 )
 
 # Include needed to use SDL under Mac OS X
@@ -41,4 +43,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   Extensions_GenericHandlers
   Extensions_FaceBuilder
   Extensions_TinyScheme
+  Extensions_Sockets
 )
