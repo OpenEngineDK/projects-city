@@ -23,10 +23,12 @@
 	
 	
 
-(define process (lambda (n)
-	;(display n)
-	;(display "\n")
-		(apply-process n)
-			;(test n)
+(define process 
+  ;(lambda ()
+    (lambda (n)
+    ;(display n)
+    ;(display "\n")
+      (apply-process n)
+    ;(test n)
 	))
 

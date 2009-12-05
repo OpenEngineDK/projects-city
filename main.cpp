@@ -30,13 +30,16 @@
 #include <Display/InterpolatedViewingVolume.h>
 #include <Display/PerspectiveViewingVolume.h>
 #include <Display/TrackingCamera.h>
+#include <Display/QtEnvironment.h>
 
 #include <Scene/VertexArrayTransformer.h>
 #include <Script/Scheme.h>
 #include <Script/ScriptBridge.h>
+#include <Network/IRCClient.h>
 
 // Game factory
 #include "Echo.h"
+#include "MainUI.h"
 
 // name spaces that we will be using.
 // this combined with the above imports is almost the same as
@@ -57,8 +60,10 @@ using namespace OpenEngine::Script;
  * method in Java.
  */
 int main(int argc, char** argv) {
+  
+    QtEnvironment *env = new QtEnvironment(false);
 
-    SimpleSetup* setup = new SimpleSetup("Example Project Title");
+    SimpleSetup* setup = new SimpleSetup("Example Project Title",NULL,env,NULL);
     setup->AddDataDirectory("projects/city/data/");
 
     // Print usage info.
@@ -158,13 +163,23 @@ int main(int argc, char** argv) {
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
     
 
-    // Echo Client
+    // irc client
+    IRCClient* client = new IRCClient("irc.irczone.dk","oe-test","oeeer");
+    client->Join("#oe");
+    //Echo* e = new Echo("irc.irczone.dk",6667);
+    //e->LineEvent().Attach(*(new EchoPrint()));
 
-    Echo* e = new Echo("localhost",8899);
+    setup->GetEngine().ProcessEvent().Attach(*client);
+    
 
-    setup->GetEngine().ProcessEvent().Attach(*e);
+    MainUI* ui = new MainUI(*env, *setup, *client);
+
+    client->Start();
 
     setup->GetEngine().Start();
+    
+    client->Stop();
+    client->Wait();
 
     // Return when the engine stops.
     return EXIT_SUCCESS;
