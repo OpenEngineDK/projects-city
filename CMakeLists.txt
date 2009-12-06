@@ -69,4 +69,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   Extensions_TinyScheme
   Extensions_Sockets
   Extensions_IRC
+  Extensions_OpenGLSelection
 )

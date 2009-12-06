@@ -1,6 +1,7 @@
 #include "IRCCityBlock.h"
 #include <Geometry/FaceBuilder.h>
 #include <Scene/TransformationNode.h>
+#include <Resources/IFontResource.h>
 #include <Utils/CairoTextTool.h>
 
 #include "IRCCity.h"
@@ -13,7 +14,7 @@ using namespace OpenEngine::Utils;
 
 
 IRCCityBlock::IRCCityBlock(IRCCity* ci, IRCChannel* c,ISceneNode* n)
-    : root(n),channel(c),  loader(ci->loader)
+    : root(n),channel(c),loader(ci->loader), city(ci)
 {
     channel->UserJoinedEvent().Attach(*this);
     channel->UserPartedEvent().Attach(*this);
@@ -24,8 +25,8 @@ void IRCCityBlock::Handle(UserJoinedArg arg) {
 
     TransformationNode* node = new TransformationNode();
 
-    node->Move(78*users.size(),0,0);
-    //node->SetScale(Vector<3,float>(1.0,-1.0,1.0));
+    node->Move(0,78*users.size(),0);
+    node->SetScale(Vector<3,float>(1.0,-1.0,1.0));
 
     users.insert(make_pair<>(arg.user, new IRCCityBuilding(this,arg.user, node)));
     

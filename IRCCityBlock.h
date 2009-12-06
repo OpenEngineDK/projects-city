@@ -43,6 +43,8 @@ protected:
     IRCChannel* channel;
 public:
     
+    IRCCity* city;
+
     TextureLoader& loader;
 
     void Handle(UserJoinedArg arg);

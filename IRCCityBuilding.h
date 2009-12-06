@@ -5,6 +5,7 @@
 #include <Scene/ISceneNode.h>
 #include <Renderers/TextureLoader.h>
 #include <Resources/CairoResource.h>
+#include <Resources/IFontResource.h>
 
 using namespace OpenEngine::Network;
 using namespace OpenEngine::Scene;
@@ -27,7 +28,10 @@ private:
     ISceneNode* root;
 
     TextureLoader& loader;
-    CairoResourcePtr textRes;
+    //CairoResourcePtr textRes;
+    IFontTextureResourcePtr textRes;
+
+    IFontResourcePtr font;
 
     string text;
 

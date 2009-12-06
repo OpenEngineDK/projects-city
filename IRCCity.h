@@ -23,6 +23,8 @@ private:
     list<IRCCityBlock*> channels;
 public:
 
+    IFontResourcePtr font;
+
     TextureLoader& loader;    
 
     IRCCity(IRCClient&, ISceneNode*, TextureLoader&);

@@ -39,6 +39,11 @@
 #include <Script/ScriptBridge.h>
 #include <Network/IRCClient.h>
 
+#include <Utils/CameraTool.h>
+#include <Utils/ToolChain.h>
+#include <Utils/MouseSelection.h>
+
+
 // Game factory
 #include "Echo.h"
 #include "MainUI.h"
@@ -155,16 +160,34 @@ int main(int argc, char** argv) {
 //     setup->GetScene()->AddNode(dotTrans);
 
     // handlers
-    MoveHandler *move = new MoveHandler(*setup->GetCamera(),
-                                        setup->GetMouse());
+    // MoveHandler *move = new MoveHandler(*setup->GetCamera(),
+    //                                     setup->GetMouse());
 
-    //move->nodes.push_back(lightTrans);
-    // Start the engine.
-    setup->GetEngine().InitializeEvent().Attach(*move);
-    //setup->GetEngine().ProcessEvent().Attach(*move);
-    setup->GetKeyboard().KeyEvent().Attach(*move);
-    setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(rsn)));
-    setup->GetJoystick().JoystickAxisEvent().Attach(*move);
+
+
+
+    // //move->nodes.push_back(lightTrans);
+    // // Start the engine.
+    // setup->GetEngine().InitializeEvent().Attach(*move);
+    // setup->GetEngine().ProcessEvent().Attach(*move);
+    // setup->GetKeyboard().KeyEvent().Attach(*move);
+    
+    // setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(rsn)));
+    // setup->GetJoystick().JoystickAxisEvent().Attach(*move);
+
+
+    MouseSelection* ms = new MouseSelection(setup->GetFrame(), setup->GetMouse(), NULL);
+    CameraTool* ct   = new CameraTool();
+    ToolChain* tc    = new ToolChain();
+    tc->PushBackTool(ct);
+
+    setup->GetRenderer().PostProcessEvent().Attach(*ms);
+    setup->GetMouse().MouseMovedEvent().Attach(*ms);
+    setup->GetMouse().MouseButtonEvent().Attach(*ms);
+    setup->GetKeyboard().KeyEvent().Attach(*ms);
+
+    ms->BindTool(&(setup->GetRenderer().GetViewport()), tc);
+
 
     setup->ShowFPS();
 
@@ -190,11 +213,11 @@ int main(int argc, char** argv) {
     IRCCity* ic = new IRCCity(*client, ircNode, setup->GetTextureLoader());
 
     
-    // IFontResourcePtr font = ResourceManager<IFontResource>::Create("Fonts/FreeSerif.ttf");
-    // font->SetPointSize(12.0);
-    // font->SetFontColor(Vector<3,float>(1,0,0));
-    // font->Load();
-    // ic->font = font;
+    IFontResourcePtr font = ResourceManager<IFontResource>::Create("Fonts/FreeSerif.ttf");
+    font->SetPointSize(12.0);
+    //font->SetFontColor(Vector<3,float>(1,0,0));
+    font->Load();
+    ic->font = font;
 
     setup->GetScene()->AddNode(ircNode);
 
