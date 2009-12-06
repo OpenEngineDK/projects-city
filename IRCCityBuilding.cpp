@@ -23,7 +23,7 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
     textTool.DrawText(text, textRes);
 
     loader.Load(textRes, TextureLoader::RELOAD_QUEUED);
-
+    textRes->RebindTexture();
 
     FaceSet *fs = new FaceSet();
     FaceBuilder::FaceState st;
@@ -43,7 +43,7 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
 
 void IRCCityBuilding::AppendMsg(string m) {
    
-    //text += "\n";
+    text += "\n";
     text += m;
     
     CairoTextTool textTool;
