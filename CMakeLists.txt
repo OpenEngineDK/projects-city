@@ -17,7 +17,14 @@ SET( PROJECT_SOURCES
   CityAnimator.h
   Echo.h
   Echo.cpp
+  MainUI.h
   MainUI.cpp
+  IRCCity.h
+  IRCCity.cpp
+  IRCCityBlock.h
+  IRCCityBlock.cpp
+  IRCCityBuilding.h
+  IRCCityBuilding.cpp
 )
 
 INCLUDE(${QT_USE_FILE})
@@ -54,6 +61,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   OpenEngine_Scene
   # Extension dependencies
   Extensions_SDL
+  Extensions_SDLFont
   Extensions_Qt
   Extensions_SetupHelpers
   Extensions_GenericHandlers

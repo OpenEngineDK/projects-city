@@ -23,6 +23,7 @@ class MainUI : public QMainWindow, public IListener<JoinedChannelArg> {
 
 public slots:
     void SendMsg();
+    void TextChanges(QString&);
 
 public:
     MainUI(QtEnvironment& env,

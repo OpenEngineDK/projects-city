@@ -17,13 +17,18 @@ MainUI::MainUI(QtEnvironment& env,
 
     chan = NULL;
 
+
     show();
 }
 
 
 void MainUI::Handle(JoinedChannelArg arg) {
     logger.info << "Joined" << logger.end;
-    chan = &(arg.channel);
+    chan = (arg.channel);
+}
+
+void MainUI::TextChanges(QString& s) {
+    
 }
 
 void MainUI::SendMsg() {
@@ -32,13 +37,9 @@ void MainUI::SendMsg() {
 
     logger.info << "Send stuff: " << str << logger.end;
     if (str[0] != '/' && chan) {
-        
+        // Send the string to the channel!        
         chan->SendMsg(str);
-            
-        // Send the string to the channel!
-
     }
-    
 
     ui->inputEdit->setText(QString());
 }
