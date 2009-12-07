@@ -199,7 +199,9 @@ int main(int argc, char** argv) {
     setup->GetCamera()->LookAt(0,0,0);
 
     // irc client
-    string nick(getlogin());
+    char *login = getlogin();
+
+    string nick(login?login:"random");
     nick += "-oe";
 
     IRCClient* client = new IRCClient("irc.freenode.org",nick,"oeeer");
