@@ -23,7 +23,9 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
 
 
     //textRes = CairoResource::Create(64,128);
-    textRes = font->CreateFontTexture();
+    font->SetColor(Vector<3,float>(0.0,0.0,0.0));
+    textRes = font->CreateFontTexture(128,64);
+    textRes->SetBackground(Vector<4,float>(1,1,1,1));
     textRes->Load();
 
     text = user->nick;
@@ -70,14 +72,14 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
                           Vector<3,float>(128,60,64));
 
     GeometryNode* gn = new GeometryNode(fs);
-    BlendingNode* bn = new BlendingNode();
+    // BlendingNode* bn = new BlendingNode();
 
-    bn->SetSource(BlendingNode::SRC_ALPHA);
-    bn->SetDestination(BlendingNode::ONE_MINUS_SRC_ALPHA);
+    // bn->SetSource(BlendingNode::SRC_ALPHA);
+    // bn->SetDestination(BlendingNode::ONE_MINUS_SRC_ALPHA);
 
-    bn->AddNode(gn);
+    // bn->AddNode(gn);
 
-    root->AddNode(bn);
+    root->AddNode(gn);
 }
 
 void IRCCityBuilding::AppendMsg(string m) {

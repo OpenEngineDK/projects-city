@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
 
     
     IFontResourcePtr font = ResourceManager<IFontResource>::Create("Fonts/FreeSerif.ttf");
-    font->SetPointSize(12.0);
+    font->SetSize(12.0);
     //font->SetFontColor(Vector<3,float>(1,0,0));
     font->Load();
     ic->font = font;
