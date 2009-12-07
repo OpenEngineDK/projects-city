@@ -202,8 +202,8 @@ int main(int argc, char** argv) {
     string nick(getlogin());
     nick += "-oe";
 
-    //IRCClient* client = new IRCClient("irc.freenode.org","oe-test","oeeer");
-    IRCClient* client = new IRCClient("irc.irczone.dk",nick,"oeeer");
+    IRCClient* client = new IRCClient("irc.freenode.org",nick,"oeeer");
+    //IRCClient* client = new IRCClient("irc.irczone.dk",nick,"oeeer");
     client->Join("#openengine");
 
     setup->GetEngine().ProcessEvent().Attach(*client);

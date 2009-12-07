@@ -15,12 +15,12 @@ using namespace OpenEngine::Resources;
 using namespace OpenEngine::Utils;
 
 
-IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n) 
+IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
     : user(u),channel(block->channel),root(n),loader(block->loader) {
 
     font = block->city->font;
 
-    
+
 
     //textRes = CairoResource::Create(64,128);
     textRes = font->CreateFontTexture();
@@ -31,7 +31,7 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
     //CairoTextTool textTool;
     //textTool.DrawText(text, textRes);
     loader.Load(textRes, TextureLoader::RELOAD_IMMEDIATE);
-    textRes->SetText("Hello World");
+    textRes->SetText(text);
 
 
     //textRes->RebindTexture();
@@ -77,16 +77,16 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
 
     bn->AddNode(gn);
 
-    root->AddNode(bn);  
+    root->AddNode(bn);
 }
 
 void IRCCityBuilding::AppendMsg(string m) {
-   
-    text += "\n";
+
+    text += "\r\n";
     text += m;
 
     textRes->SetText(text);
-    
+
     // CairoTextTool textTool;
     // textTool.DrawText(text, textRes);
     // textRes->RebindTexture();
