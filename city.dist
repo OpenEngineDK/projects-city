@@ -40,8 +40,9 @@ darcs-dev /extensions/TinyScheme             fh.daimi.au.dk:/users/cgd/code/exte
 darcs-dev /extensions/FaceBuilder            fh.daimi.au.dk:/users/cgd/code/extensions/FaceBuilder
 darcs-dev /extensions/SDL                    fh.daimi.au.dk:/users/cgd/code/extensions/SDL
 darcs-dev /extensions/IRC                    fh.daimi.au.dk:/users/cgd/code/extensions/IRC
-darcs-dev /extensions/Sockets                    fh.daimi.au.dk:/users/cgd/code/extensions/Sockets
+darcs-dev /extensions/Sockets                fh.daimi.au.dk:/users/cgd/code/extensions/Sockets
 darcs-dev /extensions/OpenGLRenderer         fh.daimi.au.dk:/users/cgd/code/extensions/OpenGLRenderer
+darcs-dev /extensions/OpenGLSelection        fh.daimi.au.dk:/users/cgd/code/extensions/OpenGLSelection
 darcs-dev /extensions/TGAResource            fh.daimi.au.dk:/users/cgd/code/extensions/TGAResource
 darcs-dev /extensions/OBJResource            fh.daimi.au.dk:/users/cgd/code/extensions/OBJResource
 darcs-dev /extensions/AccelerationStructures fh.daimi.au.dk:/users/cgd/code/extensions/AccelerationStructures
