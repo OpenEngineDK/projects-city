@@ -1,7 +1,7 @@
 #ifndef _CITY_MAIN_UI_H_
 #define _CITY_MAIN_UI_H_
 
-#include <QtGUI>
+#include <QtGui>
 
 #include <Display/QtEnvironment.h>
 #include <Utils/SimpleSetup.h>
