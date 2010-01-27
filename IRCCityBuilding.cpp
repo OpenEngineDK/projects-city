@@ -17,23 +17,22 @@ using namespace OpenEngine::Utils;
 
 IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
     : user(u),channel(block->channel),root(n),loader(block->loader) {
-
+    random.SeedWithTime();
     font = block->city->font;
 
 
 
     //textRes = CairoResource::Create(64,128);
-    font->SetColor(Vector<3,float>(0.0,0.0,0.0));
+    font->SetColor(Vector<3,float>(1.0,0.0,1.0));
     textRes = font->CreateFontTexture(128,64);
-    textRes->SetBackground(Vector<4,float>(1,1,1,1));
-    textRes->Load();
-
+    textRes->Clear(Vector<4,float>(1,1,1,1));
+    
     text = user->nick;
 
     //CairoTextTool textTool;
     //textTool.DrawText(text, textRes);
     loader.Load(textRes, TextureLoader::RELOAD_IMMEDIATE);
-    textRes->SetText(text);
+    font->RenderText(text, textRes, random.UniformFloat(0,1)*textRes->GetWidth(), random.UniformFloat(0,1)*textRes->GetHeight());
 
 
     //textRes->RebindTexture();
@@ -50,7 +49,7 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
     st.color = Vector<4,float>(0,1,0,1);
     states.push_back(st);
 
-    st.color = Vector<4,float>(0,0,1,1);
+    st.color = Vector<4,float>(0,1,1,1);
     states.push_back(st);
 
 
@@ -84,10 +83,11 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
 
 void IRCCityBuilding::AppendMsg(string m) {
 
-    text += "\r\n";
-    text += m;
+    // text += "\r\n";
+    // text += m;
 
-    textRes->SetText(text);
+    text = m;
+    font->RenderText(text, textRes, random.UniformFloat(0,1)*textRes->GetWidth(), random.UniformFloat(0,1)*textRes->GetHeight());
 
     // CairoTextTool textTool;
     // textTool.DrawText(text, textRes);

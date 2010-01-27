@@ -43,9 +43,9 @@ protected:
     IRCChannel* channel;
 public:
     
+    TextureLoader& loader;
     IRCCity* city;
 
-    TextureLoader& loader;
 
     void Handle(UserJoinedArg arg);
     void Handle(UserPartedArg arg);

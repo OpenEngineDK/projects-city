@@ -6,11 +6,13 @@
 #include <Renderers/TextureLoader.h>
 #include <Resources/CairoResource.h>
 #include <Resources/IFontResource.h>
+#include <Math/RandomGenerator.h>
 
 using namespace OpenEngine::Network;
 using namespace OpenEngine::Scene;
 using namespace OpenEngine::Renderers;
 using namespace OpenEngine::Resources;
+using namespace OpenEngine::Math;
 
 
 class IRCCityBlock;
@@ -34,6 +36,7 @@ private:
     IFontResourcePtr font;
 
     string text;
+    RandomGenerator random;
 
 public:
     IRCCityBuilding(IRCCityBlock*,User*,ISceneNode*);
