@@ -31,7 +31,8 @@
 #include <Display/PerspectiveViewingVolume.h>
 #include <Display/TrackingCamera.h>
 #include <Display/QtEnvironment.h>
-#include <Resources/SDLFont.h>
+// #include <Resources/SDLFont.h>
+#include <Resources/CairoFont.h>
 #include <Resources/ResourceManager.h>
 
 //#include <Scene/VertexArrayTransformer.h>
@@ -98,7 +99,8 @@ int main(int argc, char** argv) {
 
     //ISceneNode* node = c->GetNode();
 
-    ResourceManager<IFontResource>::AddPlugin(new SDLFontPlugin());
+    ResourceManager<IFontResource>::AddPlugin(new CairoFontPlugin());
+    // ResourceManager<IFontResource>::AddPlugin(new SDLFontPlugin());
 
     RenderStateNode *rsn = new RenderStateNode();
 
