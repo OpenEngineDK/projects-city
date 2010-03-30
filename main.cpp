@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
     TransformationNode *lightTrans = new TransformationNode();
     lightTrans->Move(0, 50, 50);
     //lightTrans->Rotate(0, 0, 0);
-    LightNode *ln = new PointLightNode();
+    PointLightNode *ln = new PointLightNode();
     ln->diffuse = Vector<4,float>(.5,.5,.5,1);
     ISceneNode *root = rsn;
     //root = new SceneNode();
