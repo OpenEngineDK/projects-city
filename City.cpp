@@ -11,6 +11,7 @@
 #include <Geometry/FaceBuilder.h>
 #include <Math/RandomGenerator.h>
 #include <Scene/TransformationNode.h>
+#include <Scene/SceneNode.h>
 #include "Building.h"
 
 using namespace OpenEngine::Math;
@@ -19,13 +20,15 @@ using namespace OpenEngine::Math;
 
 City::City() {
 
-    fs = new FaceSet();
+    //fs = new FaceSet();
     grid = new CityGrid(30,30);
     
     Build();
 }
 
 void City::Build() {
+    node = new SceneNode();
+    
     Vector<2,int> size = grid->GetSize();
     
     RandomGenerator rg;
@@ -34,22 +37,19 @@ void City::Build() {
     st.color[0] = 1;
     
     for (int i=0;i<size[0];i++) {
-        for (int j=0;j<size[1];j++) {
-
-            
-            Building b(grid->PositionForBuilding(i,j),&rg);
-            
-            b.AddToFaceSet(fs);
-            
-
- 
+        for (int j=0;j<size[1];j++) {            
+            TransformationNode *tnode = new TransformationNode();
+            Vector<2,float> p = grid->PositionForBuilding(i,j);
+            Building b(p,&rg);
+            //FaceSet* fs = new FaceSet();
+            //b.AddToFaceSet(fs);
+            tnode->AddNode(b.GetNode());
+            tnode->SetPosition(Vector<3,float>(p[0],0,p[1]));
+            //delete fs;
+            node->AddNode(tnode);
         }
     }
-        
-
-    
-    node = new GeometryNode(fs);
-    
+    //node = new GeometryNode(fs);    
 }
 
 CityGrid* City::GetGrid() {

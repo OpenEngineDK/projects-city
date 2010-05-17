@@ -19,6 +19,8 @@ darcs /extensions/FaceBuilder            http://openengine.dk/code/extensions/Fa
 darcs /extensions/SDL                    http://openengine.dk/code/extensions/SDL
 darcs /extensions/IRC                    http://openengine.dk/code/extensions/IRC
 darcs /extensions/Qt                    http://openengine.dk/code/extensions/Qt
+darcs /extensions/RBPhysics                    http://openengine.dk/code/extensions/RBPhysics
+darcs /extensions/MeshUtils                    http://openengine.dk/code/extensions/MeshUtils
 darcs /extensions/Sockets                    http://openengine.dk/code/extensions/Sockets
 darcs /extensions/SDLImage               http://openengine.dk/code/extensions/SDLImage
 darcs /extensions/SDLFont         http://openengine.dk/code/extensions/SDLFont

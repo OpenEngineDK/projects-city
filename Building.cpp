@@ -9,17 +9,20 @@
 
 #include "Building.h"
 #include <Geometry/FaceBuilder.h>
+#include <Utils/MeshCreator.h>
 
+using namespace OpenEngine::Utils;
 
 Building::Building(Vector <2,float> pos, RandomGenerator* rg) : pos(pos), rg(rg) {
-
+    node = new MeshNode();
+    Build();
 }
 
-void Building::AddToFaceSet(FaceSet* fs) {
-    
+//void Building::AddToFaceSet(FaceSet* fs) {
+void Building::Build() {
     FaceBuilder::FaceState st;
-    
     st.color = Vector<4,float>(0,1,0,1);
+    st.mat->diffuse = Vector<4,float>(.5,.5,.5,1.0);
     
     
     
@@ -32,7 +35,7 @@ void Building::AddToFaceSet(FaceSet* fs) {
      -30*rg.UniformFloat(0, 10));
      */
     
-    int sections = rg->UniformInt(1, 3);
+    int sections = 1;//rg->UniformInt(1, 3);
     
     float maxW=30,maxD=30;
     float minW=20,minD=20;
@@ -43,9 +46,11 @@ void Building::AddToFaceSet(FaceSet* fs) {
                                                rg->UniformFloat(minD, maxD),
                                                rg->UniformFloat(minH, 40));
 
-        plane[1] += size[2]/2
-        ;
-        FaceBuilder::MakeABox(fs, st, plane, size);
+        plane[1] += size[2]/2;
+        
+        //node->SetMesh(MeshCreator::CreateSimpleBox(size, Vector<3,float>(1,0,0)));
+        node->SetMesh(MeshCreator::CreateCube(size[0],1, Vector<3,float>(1,0,0)));
+        //FaceBuilder::MakeABox(fs, st, plane, size);
 
         maxW = size[0];
         maxD = size[1];
@@ -56,9 +61,9 @@ void Building::AddToFaceSet(FaceSet* fs) {
         
         
     }
-    
-    
-
-    
-    
 }
+    
+ISceneNode* Building::GetNode() {
+    return node;
+}    
+

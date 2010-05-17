@@ -13,19 +13,23 @@
 #include <Math/Vector.h>
 #include <Geometry/FaceSet.h>
 #include <Math/RandomGenerator.h>
+#include <Scene/MeshNode.h>
 
 using namespace OpenEngine::Math;
-using namespace OpenEngine::Geometry;
+using namespace OpenEngine::Scene;
 
 class Building {
   
     Vector<2,float> pos;
     RandomGenerator* rg;
+    MeshNode* node;
     
 public:
     Building(Vector<2,float> pos, RandomGenerator* rg);
     
-    void AddToFaceSet(FaceSet* fs);
+    //void AddToFaceSet(FaceSet* fs);
+    void Build();
+    ISceneNode* GetNode();
 };
 
 #endif

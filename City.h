@@ -20,11 +20,11 @@ using namespace OpenEngine::Geometry;
 
 class City {
 
-    GeometryNode* node;
+    ISceneNode* node;
     
     CityGrid* grid;
     
-    FaceSet* fs;
+    //FaceSet* fs;
     
     void Build();
     

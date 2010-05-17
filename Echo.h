@@ -22,7 +22,7 @@ struct LineEventArg {
  *
  * @class Echo Echo.h ts/city/Echo.h
  */
-class Echo : public Thread, public IListener<ProcessEventArg> {
+class Echo : public Thread, public IListener<OpenEngine::Core::ProcessEventArg> {
 private:
     TCPSocket* sock;
     bool run;
@@ -33,7 +33,7 @@ public:
     Echo(string host, int port);
     ~Echo();
 
-    void Handle(ProcessEventArg arg);
+    void Handle(OpenEngine::Core::ProcessEventArg arg);
     void Run();
     void Stop();
 

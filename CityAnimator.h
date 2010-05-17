@@ -25,7 +25,7 @@ using namespace OpenEngine::Utils;
 using namespace OpenEngine::Math;
 using namespace OpenEngine::Scene;
 
-class CityAnimator : public IListener<ProcessEventArg> {
+class CityAnimator : public IListener<OpenEngine::Core::ProcessEventArg> {
     
     bool first;
     
@@ -40,7 +40,7 @@ class CityAnimator : public IListener<ProcessEventArg> {
     
 public:
     CityAnimator(City* c, Camera *cam, TransformationNode* tn);
-    void Handle(ProcessEventArg arg);
+    void Handle(OpenEngine::Core::ProcessEventArg arg);
     
 };
 

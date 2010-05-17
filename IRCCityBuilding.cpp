@@ -40,7 +40,7 @@ IRCCityBuilding::IRCCityBuilding(IRCCityBlock* block,User* u,ISceneNode* n)
     FaceSet *fs = new FaceSet();
     FaceBuilder::FaceState st;
     st.mat = MaterialPtr(new Material());
-    st.mat->texr = textRes;
+    st.mat->AddTexture(textRes);
     st.color = Vector<4,float>(1,0,0,1);
 
     list<FaceBuilder::FaceState> states;
