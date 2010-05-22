@@ -25,6 +25,8 @@ SET( PROJECT_SOURCES
   IRCCityBlock.cpp
   IRCCityBuilding.h
   IRCCityBuilding.cpp
+  Renderers/OpenGL/AmbientOcclusion.h
+  Renderers/OpenGL/AmbientOcclusion.cpp
 )
 
 #INCLUDE(${QT_USE_FILE})

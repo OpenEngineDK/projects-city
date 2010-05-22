@@ -44,6 +44,8 @@
 #include <Utils/ToolChain.h>
 #include <Utils/MouseSelection.h>
 
+#include "Renderers/OpenGL/AmbientOcclusion.h"
+
 
 // Game factory
 #include "Echo.h"
@@ -62,6 +64,8 @@ using namespace OpenEngine::Geometry;
 using namespace OpenEngine::Resources;
 
 using namespace OpenEngine::Script;
+
+using OpenEngine::Renderers::OpenGL::AmbientOcclusion;
 
 /**
  * Main method for the first quarter project of CGD.
@@ -197,7 +201,8 @@ int main(int argc, char** argv) {
 
 
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
-
+    AmbientOcclusion* ao = new AmbientOcclusion();
+    ao->AttachTo(setup->GetRenderer());
 
     setup->GetCamera()->SetPosition(Vector<3,float>(0,200,-200));
     setup->GetCamera()->LookAt(0,0,0);
