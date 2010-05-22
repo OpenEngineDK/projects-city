@@ -163,7 +163,7 @@ namespace OpenGL {
         // Bind the fbo and attach normal and depth textures
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, normals, 0);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D, ao, 0);
+        // glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D, ao, 0);
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depth, 0);
         CHECK_FRAMEBUFFER_STATUS();
         //bind the main back buffer again
@@ -178,6 +178,7 @@ namespace OpenGL {
             ::Create("projects/city/shaders/AmbientOcclusion1.glsl");
         aoShader->Load();
         aoShader->SetTexture("normals", normtex);
+        aoShader->SetTexture("depths",  depthtex);
     }
 
     void AmbientOcclusion::Handle(RenderingEventArg arg) { 
@@ -188,11 +189,14 @@ namespace OpenGL {
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_COLOR_ARRAY);
-        glClearColor(0.0,0.0,0.0,100000.0);
+        glClearColor(0.0,0.0,0.0,1000.0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         // render the scene to collect normals and depth values
-        //normalShader->SetUniform("eyepos", arg.canvas.GetViewingVolume()->GetPosition());
+        // normalShader->SetUniform("camPos", arg.canvas.GetViewingVolume()->GetPosition());
+        // normalShader->SetUniform("camDir", arg.canvas.GetViewingVolume()->GetDirection().RotateVector(Vector<3,float>(0.0,-1.0,0.0)));
+        // normalShader->SetUniform("depthNear", 1.0f);
+        // normalShader->SetUniform("depthFar",  3000.0f); 
         normalShader->ApplyShader();
         CHECK_FOR_GL_ERROR();
         arg.canvas.GetScene()->Accept(*this);
@@ -257,8 +261,8 @@ namespace OpenGL {
 
         // glBindTexture(GL_TEXTURE_2D, normals);
 
-        glClearColor(1.0,1.0,1.0,1.0);
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        // glClearColor(1.0,1.0,1.0,1.0);
+        // glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         aoShader->ApplyShader();
         CHECK_FOR_GL_ERROR();
