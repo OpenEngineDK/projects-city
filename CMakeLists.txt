@@ -73,4 +73,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   Extensions_IRC
   Extensions_MeshUtils
   Extensions_OpenGLSelection
+  Extensions_AssimpResource
 )

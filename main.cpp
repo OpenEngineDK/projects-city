@@ -45,7 +45,7 @@
 #include <Utils/MouseSelection.h>
 
 #include "Renderers/OpenGL/AmbientOcclusion.h"
-
+#include <Resources/AssimpResource.h>
 
 // Game factory
 #include "Echo.h"
@@ -106,27 +106,43 @@ int main(int argc, char** argv) {
     ISceneNode* node = c->GetNode();
 
     ResourceManager<IFontResource>::AddPlugin(new CairoFontPlugin());
+    ResourceManager<IModelResource>::AddPlugin(new AssimpPlugin());
     // ResourceManager<IFontResource>::AddPlugin(new SDLFontPlugin());
 
     RenderStateNode *rsn = new RenderStateNode();
 
     //rsn->EnableOption(RenderStateNode::TEXTURE);
     rsn->EnableOption(RenderStateNode::COLOR_MATERIAL);
-    rsn->EnableOption(RenderStateNode::LIGHTING);
+    rsn->DisableOption(RenderStateNode::LIGHTING);
     rsn->DisableOption(RenderStateNode::BACKFACE);
+    ISceneNode *root = rsn;
 
     TransformationNode *lightTrans = new TransformationNode();
-    lightTrans->Move(0, 50, 50);
+    lightTrans->SetPosition(Vector<3,float>(100, -1000, 100));
     //lightTrans->Rotate(0, 0, 0);
     PointLightNode *ln = new PointLightNode();
     ln->diffuse = Vector<4,float>(.5,.5,.5,1);
-    ISceneNode *root = rsn;
-    //root = new SceneNode();
-    
-
-    //ln->ambient = Vector<4,float>(1,1,1,1);
     lightTrans->AddNode(ln);
     root->AddNode(lightTrans);
+
+
+    TransformationNode *lightTrans1 = new TransformationNode();
+    lightTrans1->SetPosition(Vector<3,float>(100, 1000,100));
+    //lightTrans->Rotate(0, 0, 0);
+    PointLightNode *ln1 = new PointLightNode();
+    ln1->diffuse = Vector<4,float>(.5,.5,.5,1);
+    lightTrans1->AddNode(ln1);
+    root->AddNode(lightTrans1);
+    
+    TransformationNode* duckTrans = new TransformationNode();
+    duckTrans->SetPosition(Vector<3,float>(100, 0, 100));
+    IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("Collada/duck.dae");
+    duckRes->Load();
+    ISceneNode* duck = duckRes->GetSceneNode();
+    duckRes->Unload();
+    duckTrans->AddNode(duck);
+    root->AddNode(duckTrans);
+    //ln->ambient = Vector<4,float>(1,1,1,1);
 
     root->AddNode(node);
     setup->GetScene()->RemoveAllNodes();
@@ -200,9 +216,9 @@ int main(int argc, char** argv) {
      //setup->ShowFPS();
 
 
-    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
-    AmbientOcclusion* ao = new AmbientOcclusion();
-    ao->AttachTo(setup->GetRenderer());
+     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
+     AmbientOcclusion* ao = new AmbientOcclusion();
+     ao->AttachTo(setup->GetRenderer());
 
     setup->GetCamera()->SetPosition(Vector<3,float>(0,200,-200));
     setup->GetCamera()->LookAt(0,0,0);
