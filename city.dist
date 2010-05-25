@@ -12,7 +12,7 @@ darcs /projects/city http://openengine.dk/code/projects/city
 darcs-dev /projects/city fh.daimi.au.dk:/users/cgd/code/projects/city
 
 dist /extensions/GambitScheme/GambitScheme.dist http://openengine.dk/code/extensions/GambitScheme/GambitScheme.dist
-dist /extensions/Assimp  http://www.openengine.dk/code/extensions/Assimp/Assimp.dist
+dist /extensions/Assimp/Assimp.dist  http://www.openengine.dk/code/extensions/Assimp/Assimp.dist
 
 # required extensions
 darcs /extensions/SetupHelpers           http://openengine.dk/code/extensions/SetupHelpers
