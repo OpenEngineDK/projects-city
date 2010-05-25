@@ -11,6 +11,9 @@ darcs-dev / fh.daimi.au.dk:/users/cgd/code/openengine
 darcs /projects/city http://openengine.dk/code/projects/city
 darcs-dev /projects/city fh.daimi.au.dk:/users/cgd/code/projects/city
 
+dist /extensions/GambitScheme/GambitScheme.dist http://openengine.dk/code/extensions/GambitScheme/GambitScheme.dist
+dist /extensions/Assimp  http://www.openengine.dk/code/extensions/Assimp/Assimp.dist
+
 # required extensions
 darcs /extensions/SetupHelpers           http://openengine.dk/code/extensions/SetupHelpers
 darcs /extensions/HUD                    http://openengine.dk/code/extensions/HUD
@@ -44,7 +47,7 @@ darcs-dev /extensions/OpenGLSelection        fh.daimi.au.dk:/users/cgd/code/exte
 darcs-dev /extensions/TGAResource            fh.daimi.au.dk:/users/cgd/code/extensions/TGAResource
 darcs-dev /extensions/OBJResource            fh.daimi.au.dk:/users/cgd/code/extensions/OBJResource
 darcs-dev /extensions/AccelerationStructures fh.daimi.au.dk:/users/cgd/code/extensions/AccelerationStructures
-
+darcs-dev /extensions/GenericHandlers        fh.daimi.au.dk:/users/cgd/code/extensions/GenericHandlers
 # windows libraries
 win32 /libraries http://openengine.dk/data/libraries/boost-win32.zip
 win32 /libraries http://openengine.dk/data/libraries/glew-win32.zip
