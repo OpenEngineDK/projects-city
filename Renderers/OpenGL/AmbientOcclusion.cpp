@@ -10,6 +10,7 @@
 // #include <Renderers/OpenGL/AmbientOcclusion.h>
 #include "AmbientOcclusion.h"
 #include <Math/Math.h>
+#include <Math/Matrix.h>
 #include <Scene/ISceneNode.h>
 #include <Scene/MeshNode.h>
 #include <Scene/TransformationNode.h>
@@ -109,6 +110,7 @@ namespace OpenGL {
 
         // create normal texture (each rgb color represents a float3 vector)
         ITexture2DPtr normtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 4));
+        normtex->SetFiltering(NONE);
         normtex->SetColorFormat(RGBA32F);
         normtex->SetMipmapping(false);
         normtex->SetCompression(false);
@@ -118,6 +120,7 @@ namespace OpenGL {
 
         // create depth texture 
         ITexture2DPtr depthtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 1));
+        depthtex->SetFiltering(NONE);
         depthtex->SetColorFormat(DEPTH);
         depthtex->SetMipmapping(false);
         depthtex->SetCompression(false);
@@ -127,6 +130,7 @@ namespace OpenGL {
 
         // create ao texture 
         ITexture2DPtr aotex = FloatTexture2DPtr(new Texture2D<float>(width, height, 1));
+        aotex->SetFiltering(BILINEAR);
         aotex->SetColorFormat(LUMINANCE32F);
         aotex->SetMipmapping(false);
         aotex->SetCompression(false);
@@ -135,6 +139,7 @@ namespace OpenGL {
         ao = aotex->GetID();
 
         ITexture2DPtr blurtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 1));
+        blurtex->SetFiltering(BILINEAR);
         blurtex->SetColorFormat(LUMINANCE32F);
         blurtex->SetMipmapping(false);
         blurtex->SetCompression(false);
@@ -225,7 +230,6 @@ namespace OpenGL {
         CHECK_FOR_GL_ERROR();
         normalShader->ReleaseShader();
 
-
         // do magic stuff (or setup quading matrices)
 
         // Vector<4,int> d(0, 0, width, height);
@@ -273,7 +277,10 @@ namespace OpenGL {
         glDisable(GL_TEXTURE_2D);
 
         // calculate ao
-        glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        //glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
+        Matrix<4,4,float> proj = arg.canvas.GetViewingVolume()->GetProjectionMatrix();
+        aoShader->SetUniform("proj", proj);
         glClearColor(1.0,1.0,1.0,1.0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         aoShader->ApplyShader();
@@ -282,21 +289,21 @@ namespace OpenGL {
         aoShader->ReleaseShader();
         CHECK_FOR_GL_ERROR();
        
-        // blur in the x-direction
-        glDrawBuffer(GL_COLOR_ATTACHMENT2_EXT);
-        blurXShader->ApplyShader();
-        CHECK_FOR_GL_ERROR();
-        Quad();
-        blurXShader->ReleaseShader();
-        CHECK_FOR_GL_ERROR();
+        // // blur in the x-direction
+        // glDrawBuffer(GL_COLOR_ATTACHMENT2_EXT);
+        // blurXShader->ApplyShader();
+        // CHECK_FOR_GL_ERROR();
+        // Quad();
+        // blurXShader->ReleaseShader();
+        // CHECK_FOR_GL_ERROR();
 
-        // blur in the y-direction
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        blurYShader->ApplyShader();
-        CHECK_FOR_GL_ERROR();
-        Quad();
-        blurYShader->ReleaseShader();
-        CHECK_FOR_GL_ERROR();     
+        // // blur in the y-direction
+        // glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        // blurYShader->ApplyShader();
+        // CHECK_FOR_GL_ERROR();
+        // Quad();
+        // blurYShader->ReleaseShader();
+        // CHECK_FOR_GL_ERROR();     
 
         // reset gl state
         glMatrixMode(GL_PROJECTION);

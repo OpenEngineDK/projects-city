@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
     ISceneNode *root = rsn;
 
     TransformationNode *lightTrans = new TransformationNode();
-    lightTrans->SetPosition(Vector<3,float>(100, -1000, 100));
+    lightTrans->SetPosition(Vector<3,float>(100, 100, 100));
     //lightTrans->Rotate(0, 0, 0);
     PointLightNode *ln = new PointLightNode();
     ln->diffuse = Vector<4,float>(.5,.5,.5,1);
@@ -126,17 +126,20 @@ int main(int argc, char** argv) {
     root->AddNode(lightTrans);
 
 
-    TransformationNode *lightTrans1 = new TransformationNode();
-    lightTrans1->SetPosition(Vector<3,float>(100, 1000,100));
-    //lightTrans->Rotate(0, 0, 0);
-    PointLightNode *ln1 = new PointLightNode();
-    ln1->diffuse = Vector<4,float>(.5,.5,.5,1);
-    lightTrans1->AddNode(ln1);
-    root->AddNode(lightTrans1);
+    // TransformationNode *lightTrans1 = new TransformationNode();
+    // lightTrans1->SetPosition(Vector<3,float>(100, 1000,100));
+    // //lightTrans->Rotate(0, 0, 0);
+    // PointLightNode *ln1 = new PointLightNode();
+    // ln1->diffuse = Vector<4,float>(.5,.5,.5,1);
+    // lightTrans1->AddNode(ln1);
+    // root->AddNode(lightTrans1);
     
     TransformationNode* duckTrans = new TransformationNode();
-    duckTrans->SetPosition(Vector<3,float>(100, 0, 100));
-    IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("Collada/duck.dae");
+    duckTrans->SetPosition(Vector<3,float>(400, 0, 400));
+    duckTrans->SetScale(Vector<3,float>(1000.0));
+    //IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("bun_zipper.ply");
+    //IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("Collada/duck.dae");
+    IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("dragon_vrip_res2.ply");
     duckRes->Load();
     ISceneNode* duck = duckRes->GetSceneNode();
     duckRes->Unload();
