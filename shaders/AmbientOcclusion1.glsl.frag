@@ -32,8 +32,8 @@ void main(void)
     const float linearAtt = .7;
     const float contrast = 1.5; 
     const float bias = PI/6.0;
-    const float rad = 50;
-    const float wrad = 10;
+    const float rad = 50.0;
+    const float wrad = 10.0;
     const int steps = 30;
     const int rays = 10;
 
@@ -98,7 +98,7 @@ void main(void)
         ao += (sin(hAngle) - sin(tAngle)) * linearAtt * (1.0 - r*r);
     }
     //gl_FragColor = vec4(uv.x, uv.y,0,1);
-    gl_FragColor = 1.0-(ao/float(rays))* contrast;
+    gl_FragColor.r = 1.0-(ao/float(rays))* contrast;
     
     //gl_FragColor = texture2D(scene,uv) * (1.0 - (ao/float(rays)));
     //gl_FragColor *= texture2D(scene,uv);

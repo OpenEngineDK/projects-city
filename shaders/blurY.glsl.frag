@@ -19,6 +19,6 @@ void main(void)
    sum += texture2D(ao, vec2(uv.x, uv.y + 3.0*blurSize)) * 0.09;
    sum += texture2D(ao, vec2(uv.x, uv.y + 4.0*blurSize)) * 0.05;
  
-   gl_FragColor = sum.x;
+   gl_FragColor.r = sum.x;
    gl_FragColor = texture2D(scene, uv) * sum.x;
 }
