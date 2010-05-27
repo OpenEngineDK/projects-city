@@ -45,11 +45,12 @@ private:
     Initializer init;
 
     // framebuffer and texture magic
+    unsigned int width, height;
     GLuint fbo, normals, depth, ao, scene, blur;
     IShaderResourcePtr normalShader, aoShader, blurXShader, blurYShader;
     void Initialize(RenderingEventArg arg);
 
-    void Quad(unsigned int width, unsigned int height);
+    void Quad();
 public:
     AmbientOcclusion();
     virtual ~AmbientOcclusion();

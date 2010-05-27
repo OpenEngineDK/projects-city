@@ -49,7 +49,7 @@ void Building::Build() {
         plane[1] += size[2]/2;
         
         //node->SetMesh(MeshCreator::CreateSimpleBox(size, Vector<3,float>(1,0,0)));
-        node->SetMesh(MeshCreator::CreateCube(size[0],1, Vector<3,float>(1,0,0)));
+        node->SetMesh(MeshCreator::CreateCube(size[0],1, Vector<3,float>(0.5)));
         //FaceBuilder::MakeABox(fs, st, plane, size);
 
         maxW = size[0];
