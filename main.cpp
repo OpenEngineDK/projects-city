@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
     setup->GetEngine().ProcessEvent().Attach(*move);
     setup->GetJoystick().JoystickAxisEvent().Attach(*move);
     setup->GetKeyboard().KeyEvent().Attach(*move);   
-    setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(rsn)));
+    setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(*rsn)));
 
     //setup->ShowFPS();
 
