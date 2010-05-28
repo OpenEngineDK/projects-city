@@ -74,40 +74,21 @@ using OpenEngine::Renderers::OpenGL::AmbientOcclusion;
  * method in Java.
  */
 int main(int argc, char** argv) {
-
-    //QtEnvironment *env = new QtEnvironment(false);
     SDLEnvironment *env = new SDLEnvironment(800, 600);
-    
-
+   
     SimpleSetup* setup = new SimpleSetup("Example Project Title",env);
     setup->AddDataDirectory("projects/city/data/");
 
     // Print usage info.
-    logger.info << "========= Running OpenEngine Test Project =========" << logger.end;
-
-    // make something to display.
-
-    //PerspectiveViewingVolume *persp = new PerspectiveViewingVolume();
-    //persp->SetFOV(PI/1.1);
-
-    //TrackingCamera *trackingCam = new TrackingCamera(*(new PerspectiveViewingVolume));
-
-    //setup->SetCamera(*trackingCam);
+    logger.info << "========= Hello World =========" << logger.end;
 
     City* c = new City();
-    Scheme *s = new Scheme();
-    s->AddFileToAutoLoad("init.scm");
-    s->AddFileToAutoLoad("oe-init.scm");
-    s->AddFileToAutoLoad("test.scm");
-    s->EvalAndPrint("(display (+ 1 2))");
-    setup->GetEngine().ProcessEvent().Attach(*s);
 
 
     ISceneNode* node = c->GetNode();
 
     ResourceManager<IFontResource>::AddPlugin(new CairoFontPlugin());
     ResourceManager<IModelResource>::AddPlugin(new AssimpPlugin());
-    // ResourceManager<IFontResource>::AddPlugin(new SDLFontPlugin());
 
     RenderStateNode *rsn = new RenderStateNode();
 
@@ -124,15 +105,6 @@ int main(int argc, char** argv) {
     ln->diffuse = Vector<4,float>(.5,.5,.5,1);
     lightTrans->AddNode(ln);
     root->AddNode(lightTrans);
-
-
-    // TransformationNode *lightTrans1 = new TransformationNode();
-    // lightTrans1->SetPosition(Vector<3,float>(100, 1000,100));
-    // //lightTrans->Rotate(0, 0, 0);
-    // PointLightNode *ln1 = new PointLightNode();
-    // ln1->diffuse = Vector<4,float>(.5,.5,.5,1);
-    // lightTrans1->AddNode(ln1);
-    // root->AddNode(lightTrans1);
     
     TransformationNode* duckTrans = new TransformationNode();
     duckTrans->SetPosition(Vector<3,float>(400, 0, 400));
@@ -151,114 +123,29 @@ int main(int argc, char** argv) {
     setup->GetScene()->RemoveAllNodes();
     setup->GetScene()->AddNode(root);
 
-    // Transform the scene to use vertex arrays
-    //VertexArrayTransformer vaT;
-    //vaT.Transform(*(setup->GetScene()));
-
-
-    // setup->GetCamera()->SetPosition(Vector<3,float>(0,500,0));
-    // setup->GetCamera()->LookAt(0, 0, 0);
-    //setup->GetCamera()->SetPosition(Vector<3,float>(10,10,10));
-
-    // DAS DOT!
-
-    Vector<2,float> cross = c->GetGrid()->PositionForCrossing(0,0);
-    
-     TransformationNode* dotTrans = new TransformationNode();
-     dotTrans->SetPosition(Vector<3,float>(cross[0],0,cross[1]));
-
-     FaceBuilder::FaceState st;
-     st.color=Vector<4,float>(1,1,0,1);
-     FaceSet* fs = new FaceSet();
-     FaceBuilder::MakeABox(fs, st,
-                           Vector<3,float>(),
-                           Vector<3,float>(10,10,10));
-     GeometryNode* dot = new GeometryNode(fs);
-     dotTrans->AddNode(dot);
-     //trackingCam->Follow(dotTrans);
-
-     ScriptBridge::AddHandler<TransformationNode>(new TransformationNodeHandler());
-     ScriptBridge::AddHandler<Vector<3,float> >(new VectorHandler());
-
-     sbo sb = ScriptBridge::CreateSboPointer<TransformationNode>(dotTrans);
-
-     s->DefineSbo("dot-tn",sb);
-
- //    CityAnimator *an = new CityAnimator(c,setup->GetCamera(),dotTrans);
- //    setup->GetEngine().ProcessEvent().Attach(*an);
-     setup->GetScene()->AddNode(dotTrans);
-
     // handlers
-     MoveHandler *move = new MoveHandler(*setup->GetCamera(),
+    MoveHandler *move = new MoveHandler(*setup->GetCamera(),
                                          setup->GetMouse());
-     move->nodes.push_back(lightTrans);
+    move->nodes.push_back(lightTrans);
 
-     setup->GetEngine().InitializeEvent().Attach(*move);
-     setup->GetEngine().ProcessEvent().Attach(*move);
-     setup->GetJoystick().JoystickAxisEvent().Attach(*move);
-     setup->GetKeyboard().KeyEvent().Attach(*move);
+    setup->GetEngine().InitializeEvent().Attach(*move);
+    setup->GetEngine().ProcessEvent().Attach(*move);
+    setup->GetJoystick().JoystickAxisEvent().Attach(*move);
+    setup->GetKeyboard().KeyEvent().Attach(*move);
     
-     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(rsn)));
+    setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(rsn)));
+
+    //setup->ShowFPS();
 
 
-    // MouseSelection* ms = new MouseSelection(setup->GetFrame(), setup->GetMouse(), NULL);
-    // CameraTool* ct   = new CameraTool();
-    // ToolChain* tc    = new ToolChain();
-    // tc->PushBackTool(ct);
-
-    // setup->GetRenderer().PostProcessEvent().Attach(*ms);
-    // setup->GetMouse().MouseMovedEvent().Attach(*ms);
-    // setup->GetMouse().MouseButtonEvent().Attach(*ms);
-    // setup->GetKeyboard().KeyEvent().Attach(*ms);
-
-    // ms->BindTool(&(setup->GetRenderer().GetViewport()), tc);
-
-
-
-
-     //setup->ShowFPS();
-
-
-     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
-     AmbientOcclusion* ao = new AmbientOcclusion();
-     ao->AttachTo(setup->GetRenderer());
+    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
+    AmbientOcclusion* ao = new AmbientOcclusion();
+    ao->AttachTo(setup->GetRenderer());
 
     setup->GetCamera()->SetPosition(Vector<3,float>(0,200,-200));
     setup->GetCamera()->LookAt(0,0,0);
 
-    // irc client
-    char *login = getlogin();
-
-    string nick(login?login:"random");
-    nick += "-oe";
-
-    //IRCClient* client = new IRCClient("irc.freenode.org",nick,"oeeer");
-    //IRCClient* client = new IRCClient("irc.irczone.dk",nick,"oeeer");
-    //client->Join("#openengine-test");
-
-    //    setup->GetEngine().ProcessEvent().Attach(*client);
-
-    //SceneNode* ircNode = new SceneNode();
-
-    //IRCCity* ic = new IRCCity(*client, ircNode, setup->GetTextureLoader());
-
-    
-    // IFontResourcePtr font = ResourceManager<IFontResource>::Create("Fonts/FreeSerif.ttf");
-    // font->SetSize(12.0);
-    // //font->SetFontColor(Vector<3,float>(1,0,0));
-    // font->Load();
-    // //ic->font = font;
-
-    // setup->GetScene()->AddNode(ircNode);
-
-    //MainUI* ui = new MainUI(*env, *setup, *client);
-
-    //client->Start();
-
     setup->GetEngine().Start();
-
-    //client->Stop();
-    //client->Wait();
 
     // Return when the engine stops.
     return EXIT_SUCCESS;
