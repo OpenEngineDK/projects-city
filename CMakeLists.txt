@@ -6,7 +6,6 @@ SET( PROJECT_NAME "city")
 SET( PROJECT_SOURCES
   # Add all the cpp source files here
   main.cpp
-  RenderStateHandler.h
   City.cpp
   City.h
   CityGrid.cpp

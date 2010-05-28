@@ -13,8 +13,10 @@ darcs-dev /projects/city fh.daimi.au.dk:/users/cgd/code/projects/city
 
 dist /extensions/GambitScheme/GambitScheme.dist http://openengine.dk/code/extensions/GambitScheme/GambitScheme.dist
 dist /extensions/Assimp/Assimp.dist  http://www.openengine.dk/code/extensions/Assimp/Assimp.dist
+dist /extensions/ActionMappers/ActionMappers.dist  http://www.openengine.dk/code/extensions/ActionMappers/ActionMappers.dist
 
 # required extensions
+darcs /extensions/ActionMappers          http://openengine.dk/code/extensions/ActionMappers
 darcs /extensions/SetupHelpers           http://openengine.dk/code/extensions/SetupHelpers
 darcs /extensions/HUD                    http://openengine.dk/code/extensions/HUD
 darcs /extensions/TinyScheme             http://openengine.dk/code/extensions/TinyScheme

@@ -22,7 +22,9 @@
 #include <Utils/SimpleSetup.h>
 #include <Utils/MoveHandler.h>
 #include <Geometry/FaceBuilder.h>
-#include "RenderStateHandler.h"
+
+#include <Utils/RenderStateHandler.h>
+
 #include "City.h"
 #include "CityAnimator.h"
 
@@ -131,12 +133,10 @@ int main(int argc, char** argv) {
     setup->GetEngine().InitializeEvent().Attach(*move);
     setup->GetEngine().ProcessEvent().Attach(*move);
     setup->GetJoystick().JoystickAxisEvent().Attach(*move);
-    setup->GetKeyboard().KeyEvent().Attach(*move);
-    
+    setup->GetKeyboard().KeyEvent().Attach(*move);   
     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(rsn)));
 
     //setup->ShowFPS();
-
 
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
     AmbientOcclusion* ao = new AmbientOcclusion();
