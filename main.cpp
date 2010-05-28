@@ -137,9 +137,9 @@ int main(int argc, char** argv) {
     TransformationNode* duckTrans = new TransformationNode();
     duckTrans->SetPosition(Vector<3,float>(400, 0, 400));
     duckTrans->SetScale(Vector<3,float>(1000.0));
-    //IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("bun_zipper.ply");
+    //IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("bunny/bun_zipper.ply");
     //IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("Collada/duck.dae");
-    IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("dragon_vrip_res2.ply");
+    IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("dragon/dragon_vrip_res3.ply");
     duckRes->Load();
     ISceneNode* duck = duckRes->GetSceneNode();
     duckRes->Unload();
