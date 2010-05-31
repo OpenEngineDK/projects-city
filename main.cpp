@@ -29,6 +29,9 @@
 #include "City.h"
 #include "CityAnimator.h"
 
+#include "InspectorBar.h"
+
+
 //#include <Utils/FPSSurface.h>
 #include <Display/InterpolatedViewingVolume.h>
 #include <Display/PerspectiveViewingVolume.h>
@@ -49,6 +52,8 @@
 #include <Utils/CameraTool.h>
 #include <Utils/ToolChain.h>
 #include <Utils/MouseSelection.h>
+
+#include <Utils/TransformationNodeInspector.h>
 
 #include "Renderers/OpenGL/AmbientOcclusion.h"
 #include <Resources/AssimpResource.h>
@@ -153,13 +158,14 @@ int main(int argc, char** argv) {
                                                     true);
     // move->nodes.push_back(lightTrans);
 
-     setup->GetEngine().InitializeEvent().Attach(*move);
-     setup->GetEngine().ProcessEvent().Attach(*move);
-     setup->GetJoystick().JoystickAxisEvent().Attach(*move);
-     setup->GetKeyboard().KeyEvent().Attach(*move);   
-     atb->MouseButtonEvent().Attach(*move);
-     atb->MouseMovedEvent().Attach(*move);
-
+    setup->GetEngine().InitializeEvent().Attach(*move);
+    setup->GetEngine().ProcessEvent().Attach(*move);
+    setup->GetJoystick().JoystickAxisEvent().Attach(*move);
+    setup->GetKeyboard().KeyEvent().Attach(*move);   
+    atb->MouseButtonEvent().Attach(*move);
+    atb->MouseMovedEvent().Attach(*move);
+     
+    atb->AddBar(new InspectorBar(Inspect(duckTrans)));
 
 
     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(*rsn)));

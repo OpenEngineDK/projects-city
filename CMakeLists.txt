@@ -26,6 +26,8 @@ SET( PROJECT_SOURCES
   IRCCityBuilding.cpp
   Renderers/OpenGL/AmbientOcclusion.h
   Renderers/OpenGL/AmbientOcclusion.cpp
+  InspectorBar.h
+  InspectorBar.cpp
 )
 
 #INCLUDE(${QT_USE_FILE})
@@ -75,4 +77,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   Extensions_AssimpResource
 #  Extensions_GambitScheme
   Extensions_AntTweakBar
+  Extensions_Inspection
 )
