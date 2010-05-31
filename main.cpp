@@ -21,6 +21,7 @@
 // SimpleSetup
 #include <Utils/SimpleSetup.h>
 #include <Utils/MoveHandler.h>
+#include <Utils/BetterMoveHandler.h>
 #include <Geometry/FaceBuilder.h>
 
 #include <Utils/RenderStateHandler.h>
@@ -33,6 +34,9 @@
 #include <Display/PerspectiveViewingVolume.h>
 #include <Display/TrackingCamera.h>
 #include <Display/SDLEnvironment.h>
+
+#include <Display/AntTweakBar.h>
+
 // #include <Resources/SDLFont.h>
 #include <Resources/CairoFont.h>
 #include <Resources/ResourceManager.h>
@@ -125,22 +129,41 @@ int main(int argc, char** argv) {
     setup->GetScene()->RemoveAllNodes();
     setup->GetScene()->AddNode(root);
 
-    // handlers
-    MoveHandler *move = new MoveHandler(*setup->GetCamera(),
-                                         setup->GetMouse());
-    move->nodes.push_back(lightTrans);
 
-    setup->GetEngine().InitializeEvent().Attach(*move);
-    setup->GetEngine().ProcessEvent().Attach(*move);
-    setup->GetJoystick().JoystickAxisEvent().Attach(*move);
-    setup->GetKeyboard().KeyEvent().Attach(*move);   
-    setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(*rsn)));
 
     //setup->ShowFPS();
 
-    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.5,.5,.5,1));
+    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.4,.4,.4,1));
     AmbientOcclusion* ao = new AmbientOcclusion();
     ao->AttachTo(setup->GetRenderer());
+
+
+    // ant tweak bar
+    AntTweakBar *atb = new AntTweakBar();
+    atb->AttachTo(setup->GetRenderer());
+
+    setup->GetKeyboard().KeyEvent().Attach(*atb);
+    setup->GetMouse().MouseMovedEvent().Attach(*atb);
+    setup->GetMouse().MouseButtonEvent().Attach(*atb);
+    
+
+    // handlers
+    BetterMoveHandler *move = new BetterMoveHandler(*setup->GetCamera(),
+                                                    setup->GetMouse(),
+                                                    true);
+    // move->nodes.push_back(lightTrans);
+
+     setup->GetEngine().InitializeEvent().Attach(*move);
+     setup->GetEngine().ProcessEvent().Attach(*move);
+     setup->GetJoystick().JoystickAxisEvent().Attach(*move);
+     setup->GetKeyboard().KeyEvent().Attach(*move);   
+     atb->MouseButtonEvent().Attach(*move);
+     atb->MouseMovedEvent().Attach(*move);
+
+
+
+    setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(*rsn)));
+
 
     setup->GetCamera()->SetPosition(Vector<3,float>(0,200,-200));
     setup->GetCamera()->LookAt(0,0,0);
