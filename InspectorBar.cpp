@@ -13,9 +13,10 @@ InspectorBar::InspectorBar(string title, ValueList vl)
 }
 
 void InspectorBar::AddFields(AntTweakBar& m) {
+    TwBar* twBar = GetBar();
+    int val = 1;
+    TwSetParam(twBar, NULL, "iconified", TW_PARAM_INT32, 1,  &val);
 
-    
-    TwBar* twBar = GetBar();    
     for (ValueList::iterator itr = values.begin();
          itr != values.end();
          itr++) {

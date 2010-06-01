@@ -28,6 +28,7 @@
 
 #include "City.h"
 #include "CityAnimator.h"
+#include "InspectorBar.h"
 
 #include "InspectorBar.h"
 
@@ -39,6 +40,7 @@
 #include <Display/SDLEnvironment.h>
 
 #include <Display/AntTweakBar.h>
+#include <Display/TestBar.h>
 
 // #include <Resources/SDLFont.h>
 #include <Resources/CairoFont.h>
@@ -56,6 +58,7 @@
 #include <Utils/TransformationNodeInspector.h>
 
 #include "Renderers/OpenGL/AmbientOcclusion.h"
+#include "Renderers/OpenGL/ShadowMap.h"
 #include <Resources/AssimpResource.h>
 
 // Game factory
@@ -77,6 +80,7 @@ using namespace OpenEngine::Resources;
 using namespace OpenEngine::Script;
 
 using OpenEngine::Renderers::OpenGL::AmbientOcclusion;
+using OpenEngine::Renderers::OpenGL::ShadowMap;
 
 /**
  * Main method for the first quarter project of CGD.

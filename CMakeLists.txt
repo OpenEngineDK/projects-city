@@ -26,6 +26,8 @@ SET( PROJECT_SOURCES
   IRCCityBuilding.cpp
   Renderers/OpenGL/AmbientOcclusion.h
   Renderers/OpenGL/AmbientOcclusion.cpp
+  Renderers/OpenGL/ShadowMap.h
+  Renderers/OpenGL/ShadowMap.cpp
   InspectorBar.h
   InspectorBar.cpp
 )
