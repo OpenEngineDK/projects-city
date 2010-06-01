@@ -65,11 +65,13 @@ private:
     ValueList values;
     void GetQuaternion(void *value, RWValue<Quaternion<float> >* rwv);
     void SetQuaternion(const void *value, RWValue<Quaternion<float> >* rwv);
+    void GetVector3f(void *value, RWValue<Vector<3,float> >* rwv);
+    void SetVector3f(const void *value, RWValue<Vector<3,float> >* rwv);
     
 public:
     InspectorBar(ValueList vl);
 
-    void AddFields(ITweakBar* bar);
+    void AddFields(AntTweakBar& m);
     static void TW_CALL AntSetCallback(const void *value, void *clientdata);
     static void TW_CALL AntGetCallback(void *value, void *clientdata);
 };

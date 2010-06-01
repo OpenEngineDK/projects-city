@@ -1,6 +1,9 @@
 #include "InspectorBar.h"
 #include <Logging/Logger.h>
 
+#include <Display/AntTweakBar.h>
+
+using namespace OpenEngine::Display;
 
 InspectorBar::InspectorBar(ValueList vl) 
   : ITweakBar("test"),
@@ -9,17 +12,17 @@ InspectorBar::InspectorBar(ValueList vl)
     
 }
 
+void InspectorBar::AddFields(AntTweakBar& m) {
 
-void InspectorBar::AddFields(ITweakBar* b) {
+    
     TwBar* twBar = GetBar();    
     for (ValueList::iterator itr = values.begin();
          itr != values.end();
          itr++) {
 
         IValue* val = *itr;
-        
-        RWValue<Quaternion<float> > *qv = dynamic_cast<RWValue<Quaternion<float> >* >(val);
-        if (qv) {
+               
+        if (RWValue<Quaternion<float> > *qv = dynamic_cast<RWValue<Quaternion<float> >* >(val)) {
             Callback<RWValue<Quaternion<float> > > *cb
                 = new Callback<RWValue<Quaternion<float> > >(*this,
                                                                 &InspectorBar::GetQuaternion,
@@ -27,12 +30,30 @@ void InspectorBar::AddFields(ITweakBar* b) {
                                                                 qv);
 
             TwAddVarCB(twBar, 
-                       val->name.c_str(),
+                       qv->name.c_str(),
                        TW_TYPE_QUAT4F,
                        &InspectorBar::AntSetCallback,
                        &InspectorBar::AntGetCallback,
                        cb,
                        "");
+        } else if (RWValue<Vector<3,float> > *vv = dynamic_cast<RWValue<Vector<3,float> >* > (val)) {
+
+            Callback<RWValue<Vector<3,float> > > *cb
+                = new Callback<RWValue<Vector<3, float> > >(*this,
+                                                            &InspectorBar::GetVector3f,
+                                                            &InspectorBar::SetVector3f,
+                                                            vv);
+
+
+            TwAddVarCB(twBar, 
+                       vv->name.c_str(),
+                       m.antVec3fType,
+                       &InspectorBar::AntSetCallback,
+                       &InspectorBar::AntGetCallback,
+                       cb,
+                       "");
+
+            
         } else {
 
             string* hesten = new string("hesten"); 
@@ -59,6 +80,24 @@ void InspectorBar::SetQuaternion(const void *value, RWValue<Quaternion<float> > 
     q[3] = val[3];
     rwv->Set(q);
 }
+
+void InspectorBar::GetVector3f(void *value, RWValue<Vector<3,float> > *rwv) {
+    Vector<3,float> v = rwv->Get();
+    AntTweakBar::antVec3f *val = (AntTweakBar::antVec3f*)value;
+    val->x = v[0];
+    val->y = v[1];
+    val->z = v[2];
+}
+
+void InspectorBar::SetVector3f(const void *value, RWValue<Vector<3,float> > *rwv) {
+    Vector<3,float> v;
+    AntTweakBar::antVec3f *val = (AntTweakBar::antVec3f*)value;
+    v[0] = val->x;
+    v[1] = val->y;
+    v[2] = val->z;
+    rwv->Set(v);
+}
+
 
 void TW_CALL InspectorBar::AntSetCallback(const void *value, void *clientdata) {
     ICallback* cb = (ICallback*)clientdata;
