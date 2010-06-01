@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
     atb->MouseButtonEvent().Attach(*move);
     atb->MouseMovedEvent().Attach(*move);
      
-    atb->AddBar(new InspectorBar(Inspect(duckTrans)));
+    atb->AddBar(new InspectorBar("duck",Inspect(duckTrans)));
 
 
     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(*rsn)));

@@ -5,8 +5,8 @@
 
 using namespace OpenEngine::Display;
 
-InspectorBar::InspectorBar(ValueList vl) 
-  : ITweakBar("test"),
+InspectorBar::InspectorBar(string title, ValueList vl) 
+  : ITweakBar(title),
     values(vl)
 {
     

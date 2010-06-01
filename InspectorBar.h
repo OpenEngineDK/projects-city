@@ -69,7 +69,7 @@ private:
     void SetVector3f(const void *value, RWValue<Vector<3,float> >* rwv);
     
 public:
-    InspectorBar(ValueList vl);
+    InspectorBar(string title, ValueList vl);
 
     void AddFields(AntTweakBar& m);
     static void TW_CALL AntSetCallback(const void *value, void *clientdata);
