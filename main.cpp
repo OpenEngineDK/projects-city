@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
     setup->GetEngine().InitializeEvent().Attach(*move);
     setup->GetEngine().ProcessEvent().Attach(*move);
     setup->GetJoystick().JoystickAxisEvent().Attach(*move);
-    setup->GetKeyboard().KeyEvent().Attach(*move);   
+    atb->KeyEvent().Attach(*move);   
     atb->MouseButtonEvent().Attach(*move);
     atb->MouseMovedEvent().Attach(*move);
      
