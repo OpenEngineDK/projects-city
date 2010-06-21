@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[a4paper]{article} 
 
 %% Preamble %%
 %
@@ -7,29 +7,51 @@
 % Listing:
 %  listing vs. minted?
 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage[plainpages=false]{hyperref}
+\usepackage{verbatim}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{listing}
+\usepackage[round]{natbib}
 
-\title{Nice name}
+\graphicspath{{graphics/}}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+
+\lstset{basicstyle=\ttfamily \footnotesize}
+\lstset{keywordstyle=\textbf}
+\lstset{commentstyle=\normalfont \textit}
+\lstset{stringstyle=\bfseries}
+\lstset{showstringspaces=false}
+\lstnewenvironment{cppcode}{\lstset{language=C++}}{}
+
+\title{Real Time Rendering of Shadows}
 \author{
   Peter Kristensen -- 20051866 \and
   Thomas Salomon -- 20052178
 }
 
 
-
-
 \begin{document}
 
 \maketitle
 
-\section {Introduction}
+\include{intro}
 
 \section {OpenEngine}
 
-W00t
-
-\section{Ambient Occoclusduinasdhiegrhr Ding}
+\include{ambient}
 
 \include{shadowmapping}
+
+\clearpage
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{plainnat}
+\bibliography{ref}
 
 \end{document}
 
