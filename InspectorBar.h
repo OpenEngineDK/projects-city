@@ -22,6 +22,7 @@ using namespace OpenEngine::Math;
 
 using namespace OpenEngine::Display;
 using namespace OpenEngine::Utils;
+using namespace OpenEngine::Utils::Inspection;
 
 /**
  * Short description.
