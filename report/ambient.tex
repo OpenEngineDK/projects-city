@@ -50,6 +50,7 @@ radius given by
 \end{equation}
 
 \subsection{Screen Space Ambient Occlusion}
+\label{sec:ssao}
 Ambient occlusion as described in the above could be done by tracing a
 finite number of rays for a discretized set of points on each planar
 surface and performing intersection tests with nearby
@@ -64,7 +65,7 @@ approximating ambient occlusion as previously described. The algorithm
 is completely independent of scene geometry as it uses the depth
 buffer as a rough approximation of the visible geometry. Assuming that
 the depth buffer is available together with a buffer containing the
-surface normals given in screen space coordinates of the geometry
+surface normals given in eye-space coordinates of the geometry
 behind each fragment, this technique can be viewed as a geometry
 independent post-processing effect. As a result the complexity of the
 algorithm only depends on the resolution of the screen.
@@ -80,16 +81,42 @@ technique called ray-marching. Ray-marching traces a ray by stepping
 along the direction of the ray. The step size is a fixed predermined
 value. Occluders are then detected by testing intersections with the
 height map determined by the depth buffer.
+\todo{describe unprojection}
 
-\subsection{Horizon Based Ambient Occlusion}
+\subsection{Horizon-based Ambient Occlusion}
 A further performance improvement is achieved by realising that
 ray-marching in eye-space is unnecessary since our input data is
 two-dimensional \citep{hbao}. This is the underlying observation of
-the horizon based ambient occlusion approach, where we trace entirely
-in image space. 
+the horizon-based ambient occlusion approach, where we trace entirely
+in image-space. For each fragment in the image plane we unproject the
+corresponding three-dimensional point $\mathbf{P}$ as described in
+section \ref{sec:ssao}. We then approximate the hemisphere by
+projecting a sphere centered in $\mathbf{P}$ back onto the image
+plane. On the resulting two-dimensional circle we randomly pick a
+finite number of uniformly distributed two-dimensional directions. In
+each of these directions we now determine a horizon line by stepping
+in image-space and compare depth values along the way. The horizon
+line is then given by the vector going from $\mathbf{P}$ to the
+highest point on the height map along the traced line. The point is
+obtained by unprojecting the two-dimensional point with the lowest
+depth value as was done with the point $\mathbf{P}$. The concept of
+the horizon line is illustrated in figure \ref{fig:horizon}.
+\begin{figure}[h]
+  \centering
+  tis
+  \caption{Horizon stuff.}
+  \label{fig:horizon}
+\end{figure}
+To obtain an occlusion measure in a given direction we compare the
+the horizon with the surface normal $\hat{n}$ in the point
+$\mathbf{P}$. This is done in the following way.
+
+\subsection{Applying the Ambient Occlusion Map}
 
 \subsection{Implementation}
-Impl
+
+We have implemented a variant of the horizon-based ambient occlusion
+using a bilinear blending strategy for smoothing the ao map
 
 \subsection{Results}
 Demo!
