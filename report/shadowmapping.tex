@@ -1,7 +1,53 @@
 
 \section{Shadow Mapping}
 
-Hejsa
+Shadow Mapping is a image-based shadowing technique.
+
+The technique was first described in \cite{lance78}.
+
+In 1985, Pixar used shadow mapping to create the video Luxo Jr. This
+non real-time video was extremely impressive at its time.
+\todo{stuff}
+In 2001 at Macworld Expo Japan, Steve Jobs shows a real-time version
+using OpenGL.
+
+\todo{more bla.bla}
+
+Shadow Mapping is a two-pass algorithm. The first step is to create
+the ``Shadow Map'' which describes the scene from the light sources
+point of view. In the second pass this map will be used to add shadows
+while rendering the scene as seen by the camera.
+
+
+\subsection{The light source}
+
+To create the shadow map, the light sources need a bit more
+information than usually. Regular lights in OpenGL have properties
+that describes the amount of light emitted, and the placement of the
+light source. This is not enough, as we need to create a project to be
+able to render the scene from the light. \todo{omskriv?}
+
+Because of this, a light sources is more like a camera, which gives us
+a nice abstraction
+
+
+\subsection{Creating the Shadow map}
+\todo{Beskriv step 1}
+
+
+\subsection{Rendering the Scene}
+\todo{Beskriv step 2}
+
+\subsection{Limitations}
+
+
+
+Shadow mapping is a technique for adding shadows in projection based \todo{fixy?}
+3D rendering. As such, it is limited by what is possible with projections.
+
+One of these is that we cant have a field of view larger than 180
+degrees\todo{reference}. Therefor shadow mapping wont work with point
+light sources.
 
 %%% Local Variables: 
 %%% mode: latex
