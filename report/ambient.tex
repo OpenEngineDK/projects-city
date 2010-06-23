@@ -1,1 +1,95 @@
 % -*- mode: latex; mode: auto-fill; -*-
+\section{Ambient Occlusion}
+
+Ambient Occlusion is a popular technique for approximating soft
+shadows in a scene. The technique deals only with the kind of light
+that is scattered in all directions (ambient light) and as such no
+particular light source is taken into consideration. In other words
+ambient occlusion assumes a global illumination of uniform intensity
+and is completely independent of light sources.
+% It is assumed that the ambient light is of equal intensity
+% throughout the scene.
+The intensity of the ambient light on a particular point on a
+three-dimensional surface is determined by the overall occlusion due
+to geometrical objects in the vicinity of the point. In general the
+ambient occlusion of a three-dimensional point $\mathbf{P}$ with
+surface normal $\hat{n}$ can be described by the following equation
+\citep{shanmugam}:
+\begin{equation}
+  \label{eq:ao}
+  A(\mathbf{P},\hat{n}) = \frac{1}{\pi} \int_\Omega V(\hat{\omega},\mathbf{P})\max(\hat{\omega}\cdot\hat{n},0)\,\mathrm{d}\hat{\omega}
+\end{equation}
+where we integrate over every direction within a fixed radius
+hemisphere $\Omega$ centered in the point $\mathbf{P}$ with the zenith
+axis pointing in the direction of the surface normal $\hat{n}$. $V$ is
+a function that returns $1$ if any geometrical object is intersected
+when tracing from $\mathbf{P}$ in the direction of $\hat{\omega}$ and
+$0$ otherwise. The resulting value lies on the interval $[0,1]$ and
+represents a weighted average of every direction within the
+hemisphere. Each weight is dependent on the angle between the normal
+$\hat{n}$ and the direction $\hat{\omega}$ and ensures that object
+intersections with large angles contributes with less occlusion than
+intersections in a direction which is closer to the direction of the
+surface normal.
+
+For better results one can extend equation (\ref{eq:ao}) with an
+attenuation function to account for the distance between $\mathbf{P}$
+and an the occluding object. This would yield
+\begin{equation}
+  \label{eq:ao_att}
+  A(\mathbf{P},\hat{n}) = \frac{1}{\pi} \int_\Omega
+  V(\hat{\omega},\mathbf{P})\max(\hat{\omega}\cdot\hat{n},0)W(R,r) \,\mathrm{d}\hat{\omega}
+\end{equation}
+where $R$ is the hemisphere radius and $r$ is the distance between
+$\mathbf{P}$ and the occluding object. For instance $W$ could be
+defined as the quadratic attenuation function scaled by the hemisphere
+radius given by
+\begin{equation}
+  \label{eq:quad_att}
+  W(R,r) = \frac{1-r^2}{R}
+\end{equation}
+
+\subsection{Screen Space Ambient Occlusion}
+Ambient occlusion as described in the above could be done by tracing a
+finite number of rays for a discretized set of points on each planar
+surface and performing intersection tests with nearby
+geometry. Obviously this is a computationally expensive approach which
+would not work in real-time rendering. Also it would be wasteful to
+perform the calcutions described in (\ref{eq:ao}) and
+(\ref{eq:ao_att}) on every planar surface in the scene since only a
+very small number surfaces are actually visible in the final image.
+
+Screen space ambient occlusion \citep{ssao} is a fast technique for
+approximating ambient occlusion as previously described. The algorithm
+is completely independent of scene geometry as it uses the depth
+buffer as a rough approximation of the visible geometry. Assuming that
+the depth buffer is available together with a buffer containing the
+surface normals given in screen space coordinates of the geometry
+behind each fragment, this technique can be viewed as a geometry
+independent post-processing effect. As a result the complexity of the
+algorithm only depends on the resolution of the screen.
+
+The basic idea behind screen space ambient occlusion is that the depth
+buffer can be viewed as a height map depicting the curvature of
+all the front-most visible geometry with respect to the eye
+position. Each two-dimensional position on the screen surface
+can then be translated into a three-dimensional point in screen space by
+means of the depth value. A finite number of rays within the hemisphere
+in the direction of the surface normal can then be traced using a
+technique called ray-marching. Ray-marching traces a ray by stepping
+along the direction of the ray. The step size is a fixed predermined
+value. Occluders are then detected by testing intersections with the
+height map determined by the depth buffer.
+
+\subsection{Horizon Based Ambient Occlusion}
+A further performance improvement is achieved by realising that
+ray-marching in eye-space is unnecessary since our input data is
+two-dimensional \citep{hbao}. This is the underlying observation of
+the horizon based ambient occlusion approach, where we trace entirely
+in image space. 
+
+\subsection{Implementation}
+Impl
+
+\subsection{Results}
+Demo!
