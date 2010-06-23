@@ -7,11 +7,11 @@ The technique was first described in \cite{lance78}.
 
 In 1985, Pixar used shadow mapping to create the video Luxo Jr. This
 non real-time video was extremely impressive at its time.
-\todo{stuff}
+\todoPtx{stuff}
 In 2001 at Macworld Expo Japan, Steve Jobs shows a real-time version
 using OpenGL.
 
-\todo{more bla.bla}
+\todoPtx{more bla.bla}
 
 Shadow Mapping is a two-pass algorithm. The first step is to create
 the ``Shadow Map'' which describes the scene from the light sources
@@ -25,28 +25,40 @@ To create the shadow map, the light sources need a bit more
 information than usually. Regular lights in OpenGL have properties
 that describes the amount of light emitted, and the placement of the
 light source. This is not enough, as we need to create a project to be
-able to render the scene from the light. \todo{omskriv?}
+able to render the scene from the light. \todoPtx{omskriv?}
 
 Because of this, a light sources is more like a camera, which gives us
-a nice abstraction
+a nice abstraction. \todoPtx{complete me}
 
 
 \subsection{Creating the Shadow map}
-\todo{Beskriv step 1}
+\todoPtx{Beskriv step 1}
+
+The first part of the algorithm is to create the shadow map. This is
+done by rendering the scene using the light source as the camera, and
+extracting the depth buffer.
+
+\todoPtx{Husk at implementere det} The only interesting information is
+the depth, so the rendering can be speed up be disabling textures,
+lighting, colors and more. Its also convenient to disable front faces
+to avoid self-shadowing. % bla bla?
 
 
 \subsection{Rendering the Scene}
-\todo{Beskriv step 2}
+\todoPtx{Beskriv step 2}
+
+
+\subsection{Implementation}
 
 \subsection{Limitations}
 
 
 
-Shadow mapping is a technique for adding shadows in projection based \todo{fixy?}
+Shadow mapping is a technique for adding shadows in projection based \todoPtx{fixy?}
 3D rendering. As such, it is limited by what is possible with projections.
 
 One of these is that we cant have a field of view larger than 180
-degrees\todo{reference}. Therefor shadow mapping wont work with point
+degrees\todoPtx{reference}. Therefor shadow mapping wont work with point
 light sources.
 
 %%% Local Variables: 

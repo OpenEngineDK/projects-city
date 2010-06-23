@@ -20,6 +20,8 @@
 \usepackage[round]{natbib}
 \usepackage[colorinlistoftodos]{todonotes}
 
+\newcommand{\todoPtx}[2][]{\todo[color=red,    #1]{ptx: #2}}
+
 
 \graphicspath{{graphics/}}
 \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
@@ -40,6 +42,9 @@
 \begin{document}
 
 \maketitle
+
+\listoftodos
+
 
 \include{intro}
 
