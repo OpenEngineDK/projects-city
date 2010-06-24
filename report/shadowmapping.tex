@@ -32,7 +32,6 @@ a nice abstraction. \todoPtx{complete me}
 
 
 \subsection{Creating the Shadow map}
-\todoPtx{Beskriv step 1}
 
 The first part of the algorithm is to create the shadow map. This is
 done by rendering the scene using the light source as the camera, and
@@ -47,8 +46,38 @@ to avoid self-shadowing. % bla bla?
 \subsection{Rendering the Scene}
 \todoPtx{Beskriv step 2}
 
+The next step is to render the scene with shadows. For each fragment
+in the finished scene, we must decide if it is in a shadow or
+not. This is done by comparing the depth of the fragment with depth in
+the shadow map.
+
+\subsubsection{Lookup in the shadow map}
+
+Before we can compare anything, we need to find the corresponding
+point in the shadow map. To calculate this, we need create a
+projection matrix that converts model coordinates into projective
+texture coordinates.
+
+\subsubsection{Comparing Depth}
+
+Bias matrix
+
+\begin{align*}
+  B = \begin{bmatrix}
+    0.5 & 0   & 0   & 0.5 \\
+    0   & 0.5 & 0   & 0.5 \\
+    0   & 0   & 0.5 & 0.5 \\
+    0   & 0   & 0   & 1   \\
+  \end{bmatrix}
+\end{align*}
+
 
 \subsection{Implementation}
+
+\subsubsection{Lighting}
+
+When we add vertex and fragment shaders to our pipeline, we loose all
+the fixed functions, so we need to implement our own lighting.
 
 \subsection{Limitations}
 
