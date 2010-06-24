@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
     atb->MouseButtonEvent().Attach(*move);
     atb->MouseMovedEvent().Attach(*move);
      
-    atb->AddBar(new InspectorBar("duck",Inspect(duckTrans)));
+    atb->AddBar(new InspectionBar("duck",Inspect(duckTrans)));
     atb->AddBar(new InspectionBar("ambient occlusion", Inspect(ao)));
 
 
