@@ -17,6 +17,8 @@ using namespace OpenEngine::Math;
 class CityGrid { 
   
     Vector<2,int> size;
+    float bsize;
+    float margin;
     
 public:
     CityGrid(int w, int d);

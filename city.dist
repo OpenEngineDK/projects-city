@@ -14,6 +14,7 @@ darcs-dev /projects/city fh.daimi.au.dk:/users/cgd/code/projects/city
 #dist /extensions/GambitScheme/GambitScheme.dist http://openengine.dk/code/extensions/GambitScheme/GambitScheme.dist
 dist /extensions/Assimp/Assimp.dist               http://www.openengine.dk/code/extensions/Assimp/Assimp.dist
 dist /extensions/Inspection/Inspection.dist       http://www.openengine.dk/code/extensions/Inspection/Inspection.dist
+dist /extensions/InspectionBar/InspectionBar.dist       http://www.openengine.dk/code/extensions/InspectionBar/InspectionBar.dist
 dist /extensions/ActionMappers/ActionMappers.dist http://www.openengine.dk/code/extensions/ActionMappers/ActionMappers.dist
 dist /extensions/InspectionBar/InspectionBar.dist       http://www.openengine.dk/code/extensions/InspectionBar/InspectionBar.dist
 

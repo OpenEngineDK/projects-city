@@ -28,8 +28,8 @@ SET( PROJECT_SOURCES
   Renderers/OpenGL/AmbientOcclusion.cpp
   Renderers/OpenGL/ShadowMap.h
   Renderers/OpenGL/ShadowMap.cpp
-  InspectorBar.h
-  InspectorBar.cpp
+  ShadowLight.h
+  ShadowLight.cpp
 )
 
 #INCLUDE(${QT_USE_FILE})

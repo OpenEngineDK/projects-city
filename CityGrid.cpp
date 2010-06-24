@@ -10,15 +10,16 @@
 #include "CityGrid.h"
 
 CityGrid::CityGrid(int w, int d) : size(w,d) {
-
+    bsize = 3;
+    margin = 2;
 }
 
 Vector<2,float> CityGrid::PositionForBuilding(int x, int y) {
 
     
     
-    return Vector<2,float>(x*30+20*int(x/2),
-                           y*30+20*int(y/4));
+    return Vector<2,float>(x*bsize+margin*int(x/2),
+                           y*bsize+margin*int(y/4));
     
 }
 
@@ -26,8 +27,8 @@ Vector<2,float> CityGrid::PositionForCrossing(int x, int y) {
     
     
     
-    return Vector<2,float>(x*30*2+(x-1)*20-10,
-                           y*30*4+(y-1)*20-10);
+    return Vector<2,float>(x*bsize*2+(x-1)*margin-margin/2,
+                           y*bsize*4+(y-1)*margin-margin/2);
     
 }
 

@@ -37,19 +37,19 @@ void Building::Build() {
     
     int sections = 1;//rg->UniformInt(1, 3);
     
-    float maxW=30,maxD=30;
-    float minW=20,minD=20;
-    float minH=20;
+    float maxW=3,maxD=3;
+    float minW=2,minD=2;
+    float minH=2;
     
     for (int i=0;i<sections;i++) {
         Vector<3,float> size = Vector<3,float>(rg->UniformFloat(minW, maxW),
                                                rg->UniformFloat(minD, maxD),
-                                               rg->UniformFloat(minH, 40));
+                                               rg->UniformFloat(minH, 4));
 
         plane[1] += size[2]/2;
         
         //node->SetMesh(MeshCreator::CreateSimpleBox(size, Vector<3,float>(1,0,0)));
-        node->SetMesh(MeshCreator::CreateCube(size[0],1, Vector<3,float>(0.5)));
+        node->SetMesh(MeshCreator::CreateCube(size[0],1, Vector<3,float>(0,1,0)));
         //FaceBuilder::MakeABox(fs, st, plane, size);
 
         maxW = size[0];

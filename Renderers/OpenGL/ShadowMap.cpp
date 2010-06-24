@@ -108,21 +108,6 @@ void ShadowMap::drawObjects(RenderingEventArg arg) {
 }
 
 void ShadowMap::setTextureMatrix() {
-	// static double modelView[16];
-	// static double projection[16];
-	
-	// // This is matrix transform every coordinate x,y,z
-	// // x = x* 0.5 + 0.5 
-	// // y = y* 0.5 + 0.5 
-	// // z = z* 0.5 + 0.5 
-	// // Moving from unit cube [-1,1] to [0,1]  
-	// const GLdouble bias[16] = {	
-	// 	0.5, 0.0, 0.0, 0.0, 
-	// 	0.0, 0.5, 0.0, 0.0,
-	// 	0.0, 0.0, 0.5, 0.0,
-    //     0.5, 0.5, 0.5, 1.0};
-	
-
     
     IViewingVolume* vv = light->lightCam;
 
@@ -133,40 +118,22 @@ void ShadowMap::setTextureMatrix() {
     Matrix<4,4,float> Vl = vv->GetViewMatrix();
     Matrix<4,4,float> Pl = vv->GetProjectionMatrix();
     
-    Matrix<4,4,float> M = Vl*Pl*B; // WTF!
+    Matrix<4,4,float> T = Vl*Pl*B; // The order is reversed T = B*Pl*Vl 
+                                   // M is implicit (we add M in VisitTransformationNode)
     
-    //logger.info << M << logger.end;
 
-    float M_arr[16];
-    // float B_arr[16];
-    // float Pl_arr[16];
-    // float Vl_arr[16];
+    
 
-    M.ToArray(M_arr);
-    // B.ToArray(B_arr);
-    // Pl.ToArray(Pl_arr);
-    // Vl.ToArray(Vl_arr);    
+    float T_arr[16];
+    T.ToArray(T_arr);
 
 
-	// Grab modelview and transformation matrices
-	// glGetDoublev(GL_MODELVIEW_MATRIX, modelView);
-	// glGetDoublev(GL_PROJECTION_MATRIX, projection);
-	
 	
 	glMatrixMode(GL_TEXTURE);
-	glActiveTextureARB(GL_TEXTURE7);
-	
+	glActiveTextureARB(GL_TEXTURE7);	
 	glLoadIdentity();
     
-	//glLoadMatrixf(B_arr);
-	
-    // concatating all matrice into one.
-    //glMultMatrixd (projection);
-    //glMultMatrixf (Pl_arr);
-    //glMultMatrixd (modelView);
-    //glMultMatrixf (Vl_arr);
-
-    glLoadMatrixf(M_arr);
+    glLoadMatrixf(T_arr);
 	
 	// Go back to normal matrix mode
 	glMatrixMode(GL_MODELVIEW);
