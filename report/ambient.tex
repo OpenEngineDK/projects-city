@@ -7,8 +7,6 @@ that is scattered in all directions (ambient light) and as such no
 particular light source is taken into consideration. In other words
 ambient occlusion assumes a global illumination of uniform intensity
 and is completely independent of light sources.
-% It is assumed that the ambient light is of equal intensity
-% throughout the scene.
 The intensity of the ambient light on a particular point on a
 three-dimensional surface is determined by the overall occlusion due
 to geometrical objects in the vicinity of the point. In general the
@@ -46,7 +44,7 @@ defined as the quadratic attenuation function scaled by the hemisphere
 radius given by
 \begin{equation}
   \label{eq:quad_att}
-  W(R,r) = \frac{1-r^2}{R}
+  W(R,r) = 1-\left(\frac{r}{R}\right)^2
 \end{equation}
 
 \subsection{Screen Space Ambient Occlusion}
@@ -116,33 +114,84 @@ $\mathbf{P}$. This is done in the following way.
 \subsection{Implementation}
 
 We have implemented a variant of the horizon-based ambient occlusion
-using a simple gaussian blur kernel for smoothing the ao map. The
+using a simple gaussian blur kernel for smoothing the ao map.  The
 algorithm is divided into a number of stages represented by a specific
 shader program for each stage. Some of these stages could be collapsed
 into a single shader but we have chosen this strategy in order to
-toggle each phase on and off at run-time. In the following we list the
-different stages comprising our ambient occlusion effect.
+toggle each phase on and off at run-time.
 
-The only assumption we make before running the ambient occlusion code
-is that a scene has been rendered and the resulting image reside in
-the backbuffer. The contents of the back buffer is stored in a texture
-for later use by the following code
-\begin{lstlisting}
+The entire implementation resides in a post-process module wich has
+been attached to the OpenEngine renderer. The module will receive an
+event whenever the renderer has completed its main rendering phase. It
+is then safe to assume, that the back buffer contains the rendered
+scene.  The first thing we do is to store this image in a texture for
+later use. This is done in the following OpenGL code:
+\begin{cppcode}
   glBindTexture(GL_TEXTURE_2D, scene);
-  CHECK_FOR_GL_ERROR();
   glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
-  CHECK_FOR_GL_ERROR();
   glBindTexture(GL_TEXTURE_2D, 0);
-\end{lstlisting}
+\end{cppcode}
 
-\paragraph{Collecting normals and depth values.}  
-The previous assumption makes it possible to overlay an arbitrary
-scene with ambient occlusion. This also means that we have to generate
-all the surface normals and depth values in a pre-renderphase. We do
-this by traversing the scene graph and rendering all scene geometry
-with the normal shader applied.  \todo{describe normal shader}
+In the following we list the different stages comprising our ambient
+occlusion effect.
 
-\paragraph{Producing the ambient occlusion map.}  
+\subsubsection*{Initializing the ambient occlusion module}
+Our module will also receive an event from the OpenEngine renderer
+upon initialization, and at this point it is safe to assume that
+an OpenGL context has been initialized. We can then start to
+initialize the neccessary OpenGL structures which consists of a
+framebuffer to use as a render target for intermediate textures. The
+following textures are attached to the frame buffer:
+\begin{itemize}
+\item A three channel 32 bit floating point texture for storing the
+  surface normals;
+\item a depth texture for storing the z-values of the rendered scene;
+\item a single channel 32 bit floating point texture for storing the
+  ambient occlusion map;
+  \item and a single channel 32 bit floating point texture for storing the
+  result of the gaussian blur kernel.
+\end{itemize}
+We then load and compile the relevant shaders using OpenEngine's
+shader resource manager. We use the following shaders:
+\begin{itemize}
+\item A normalshader for generating surface normals;
+\item the ambient occlusion shader for generating the ambient
+  occlusion map;
+\item two gaussian blur shaders one for bluring in the x-direction and
+  one for the y-direction;
+\item and a simple merge shader for combining the ambient occlusion
+  map with the pixels from the original scene.
+\end{itemize}
+
+\subsubsection*{Collecting normals and depth values}  
+Since our only assumption is that the source image lies in the frame
+buffer, it is now possible to overlay an arbitrary scene with ambient
+occlusion in a post-render phase. This also means that we have to
+generate all the surface normals and depth values before we can
+produce the ambient occlusion map. We do this by traversing the scene
+graph and rendering all scene geometry with our normal shader
+applied. The following lines of code initiates the rendering of the normals.
+\begin{cppcode}
+  // bind normal vector frame buffer texture
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+  glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+  
+  glEnable(GL_DEPTH_TEST);
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glClearColor(0.0,0.0,0.0,1.0);
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  
+  // collect normals 
+  normalShader->ApplyShader();
+  CHECK_FOR_GL_ERROR();
+  arg.canvas.GetScene()->Accept(*this);
+  CHECK_FOR_GL_ERROR();
+  normalShader->ReleaseShader();
+\end{cppcode} 
+
+\subsubsection*{Producing the ambient occlusion map}  
 When the surface normals and the depth buffer have been obtained in
 textures we can now proceed with the actual ambient occlusion
 algorithm. The algorithm is written in a single shader and operates on
@@ -151,7 +200,7 @@ shader we initialize OpenGL to orthographic projection, push the
 identity matrix on the model view stack, and simply draw a quad
 covering the entire screen.
 
-\paragraph{Bluring the ambient occlusion map.}
+\subsubsection*{Applying the ambient occlusion map}
 
 
 \subsection{Results}
