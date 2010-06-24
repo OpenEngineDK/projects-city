@@ -61,7 +61,7 @@ to avoid self-shadowing. % bla bla?
 In figure \ref{fig:shadowmap}, the shadow map for the scene in figure
 \ref{fig:scene} is shown.
 
-\subsection{Rendering the Scene}
+\subsection{Rendering the Scene}\label{sec:render}
 
 
 The next step is to render the scene with shadows. For each fragment
@@ -137,14 +137,89 @@ The first step is to setup a framebuffer object (FBO) and a texture to
 contain the shadow map.
 
 Using the buildin support for FBO in OpenEngine, this becomes quite elegant:
+
 \begin{cppcode}
 void ShadowMap::generateShadowFBO(RenderingEventArg arg) {
 	int shadowMapWidth = SHADOW_MAP_RATIO * arg.canvas.GetWidth();
 	int shadowMapHeight = SHADOW_MAP_RATIO * arg.canvas.GetHeight();
     IRenderer& renderer = arg.renderer;
     Vector<2,int> dims(shadowMapWidth,shadowMapHeight);
-    fb = new FrameBuffer(dims,1,true);
+    fb = new FrameBuffer(dims,0,true);
     renderer.BindFrameBuffer(fb);
+}
+\end{cppcode}
+
+This code creates a object that represents a FBO and its attached
+textures. The arguments (\texttt{0,true}) creates a FBO with zero color
+attachments and a texture as the depth attachment.
+
+The call to \texttt{renderer.BindFrameBuffer(fb)} will create the
+necessary OpenGL calls and load both FBO and its corresponding
+textures to the driver.
+
+\subsubsection*{Shadow Map}
+
+To create the shadow map, we bind the FBO, and draw the scene from the
+light sources point of view. 
+
+\begin{cppcode}
+void ShadowMap::MakeMap(RenderingEventArg arg) {
+     // only a snippet
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,fb->GetID());
+    glUseProgramObjectARB(0);
+    glViewport(0, 0,
+               w * SHADOW_MAP_RATIO,
+               h * SHADOW_MAP_RATIO);
+    glClear( GL_DEPTH_BUFFER_BIT);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); 
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(poff, punits);
+    arg.renderer.ApplyViewingVolume(*(light->lightCam));
+    glCullFace(GL_FRONT);
+    arg.canvas.GetScene()->Accept(*this); return;
+    glDisable(GL_POLYGON_OFFSET_FILL);
+}
+\end{cppcode}
+
+Here we bind the FBO, removes any shader, and setup the viewport to
+the size of our shadow map. We also enable culling of front faces and
+set up polygon offset to avoid self shadowing.
+
+The \texttt{ApplyViewingVolume} method takes a camera, and send both
+modelview and projection to OpenGL.
+
+% noget om visitor?
+
+\subsubsection*{Rendering shadows}
+
+As explained in section \ref{sec:render}, we need to construct a
+matrix projection to make our lookup in the shadow map. We need to
+access the matrix from our shader, so we load it into the texture
+matrix. To avoid overriding any other texture transformations, we
+select the last texture unit, and hope no one is using it.
+
+\begin{cppcode}
+  void ShadowMap::SetTextureMatrix() {    
+    IViewingVolume* vv = light->lightCam;
+    Matrix<4,4,float> B(.5, .0, .0,  .0,
+                        .0, .5, .0,  .0,
+                        .0, .0, .5,  .0,
+                        .5, .5, .5, 1.0);
+    Matrix<4,4,float> Vl = vv->GetViewMatrix();
+    Matrix<4,4,float> Pl = vv->GetProjectionMatrix();    
+    Matrix<4,4,float> T = Vl*Pl*B; // The order is reversed T = B*Pl*Vl 
+                                   // M is implicit (we add M in VisitTransformationNode)
+    float T_arr[16];
+    T.ToArray(T_arr);
+
+    glMatrixMode(GL_TEXTURE);
+    glActiveTextureARB(GL_TEXTURE7);
+    glLoadMatrixf(T_arr);
+
+    // Go back to normal matrix mode
+    glMatrixMode(GL_MODELVIEW);
 }
 \end{cppcode}
 
@@ -157,14 +232,18 @@ the fixed functions, so we need to implement our own lighting.
 
 \subsection{Limitations}
 
-
-
 Shadow mapping is a technique for adding shadows in projection based \todoPtx{fixy?}
 3D rendering. As such, it is limited by what is possible with projections.
 
 One of these is that we cant have a field of view larger than 180
 degrees\todoPtx{reference}. Therefor shadow mapping wont work with point
 light sources.
+
+\subsection{Future Work}
+
+This implementation only supports one light source, having more would
+be a easy and useful extension.
+
 
 %%% Local Variables: 
 %%% mode: latex
