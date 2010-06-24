@@ -225,6 +225,7 @@ int main(int argc, char** argv) {
     SimpleSetup* setup = new SimpleSetup("Example Project Title",env,sm); // With Shadowmap
     //SimpleSetup* setup = new SimpleSetup("Example Project Title",env); // without
     setup->AddDataDirectory("projects/city/data/");
+    setup->AddDataDirectory("projects/city/data-repo/");
 
     // Print usage info.
     logger.info << "========= Hello World =========" << logger.end;
