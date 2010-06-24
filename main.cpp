@@ -111,6 +111,15 @@ namespace OpenEngine {
                     values.push_back(v);
                 }
                 {
+                    RWValueCall<AmbientOcclusion, bool> *v
+                        = new RWValueCall<AmbientOcclusion, bool>
+                        (*ao,
+                         &AmbientOcclusion::GetMerge,
+                         &AmbientOcclusion::SetMerge);
+                    v->name = "merge AO";
+                    values.push_back(v);
+                }
+                {
                     RWValueCall<AmbientOcclusion, float> *v
                         = new RWValueCall<AmbientOcclusion, float>
                         (*ao,

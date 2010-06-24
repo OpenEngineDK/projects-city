@@ -3,11 +3,11 @@ varying vec2 uv;
 uniform mat4 proj;
 uniform mat4 unproj;
 uniform sampler2D normals;
-uniform sampler2D scene; 
+/* uniform sampler2D scene;  */
 uniform sampler2DShadow d;
 
 uniform float sphereRad;
-uniform float linearAtt;
+/* uniform float linearAtt; */
 uniform float contrast;
 uniform float rays;
 uniform float steps;
@@ -54,26 +54,16 @@ void main(void)
 
     vec4 sample = texture2D(normals,uv);
     //if there is no no geometry in this fragment then we do nothing
-    if (length(sample.xyz) == 0.0) {
-        gl_FragColor = vec4(1.0);
-        return;
-    }
-
+    /* if (length(sample.xyz) == 0.0) { */
+    /*     gl_FragColor = vec4(1.0); */
+    /*     return; */
+    /* } */
+    
     vec2 winPos  = uv2win(uv); // window coordinates [-1;1]
     float depth  = shadow2D(d, vec3(uv,0.0)).x;
     vec3 normal  = normalize(sample.xyz);
     vec3 fragPos = unproject(winPos, depth);
 
-    // test for negative z-value
-    /* if (fragPos.z > 0.0) { */
-    /*     gl_FragColor = vec4(1.0); */
-    /*     return; */
-    /* } else { */
-    /*     gl_FragColor = vec4(0.0); */
-    /*     return; */
-    /* } */
-    
-    
     float circleRad = length(winPos - project(fragPos + vec3(sphereRad, 0.0, 0.0))); // project the sphere radius onto the screen
     //steps = min(steps, circleRad);
     float stepSize = circleRad / steps;
@@ -112,5 +102,6 @@ void main(void)
     // average ao and multiply with contrast
     gl_FragColor = vec4(1.0 - (ao/rays) * contrast);
     //gl_FragColor *= vec4(sample.xyz, 1.0);
+    
 
 }

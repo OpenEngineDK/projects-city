@@ -50,7 +50,7 @@ private:
     ITexture2DPtr normtex, depthtex, aotex, whitetex, scenetex;
     IShaderResourcePtr normalShader, aoShader, blurXShader, blurYShader, mergeShader;
 
-    bool enabled, doBlur;
+    bool enabled, doBlur, merge;
     float radius, linearAtt, contrast, rays, bias, steps;
 
     void Initialize(RenderingEventArg arg);
@@ -84,6 +84,9 @@ public:
 
     void SetBlur(bool doBlur);
     bool GetBlur();
+
+    void SetMerge(bool merge);
+    bool GetMerge();
 };
 
 } // NS OpenGL

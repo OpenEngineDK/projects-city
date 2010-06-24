@@ -36,10 +36,11 @@ namespace OpenGL {
         : init(Initializer(*this)),
           enabled(true),
           doBlur(false),
+          merge(true),
           radius(10.0),
           linearAtt(0.8),
           contrast(0.5),
-          rays(32.0),
+          rays(16.0),
           bias(Math::PI / 6.0),
           steps(5.0)
     {
@@ -112,6 +113,14 @@ namespace OpenGL {
 
     bool AmbientOcclusion::GetBlur() {
         return doBlur;
+    }
+
+    void AmbientOcclusion::SetMerge(bool merge) {
+        this->merge = merge;
+    }
+
+    bool AmbientOcclusion::GetMerge() {
+        return merge;
     }
 
     void AmbientOcclusion::VisitMeshNode(MeshNode* node) {
@@ -196,9 +205,9 @@ namespace OpenGL {
         glGenFramebuffersEXT(1, &fbo);
 
         // create normal texture (each rgb color represents a float3 vector)
-        normtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 4));
+        normtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 3));
         normtex->SetFiltering(NONE);
-        normtex->SetColorFormat(RGBA32F);
+        normtex->SetColorFormat(RGB32F);
         normtex->SetMipmapping(false);
         normtex->SetCompression(false);
         normtex->SetWrapping(CLAMP_TO_EDGE);
@@ -252,7 +261,7 @@ namespace OpenGL {
         whitetex->SetMipmapping(false);
         whitetex->SetCompression(false);
         whitetex->SetWrapping(REPEAT);
-        arg.renderer.LoadTexture(scenetex);
+        arg.renderer.LoadTexture(whitetex);
 
         // Bind the fbo and attach normal and depth textures
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
@@ -334,8 +343,8 @@ namespace OpenGL {
         CHECK_FOR_GL_ERROR();
         normalShader->ReleaseShader();
 
-        // Vector<4,int> d(0, 0, width, height);
-        // glViewport((GLsizei)d[0], (GLsizei)d[1], (GLsizei)d[2], (GLsizei)d[3]);
+        Vector<4,int> d(0, 0, width, height);
+        glViewport((GLsizei)d[0], (GLsizei)d[1], (GLsizei)d[2], (GLsizei)d[3]);
         OrthogonalViewingVolume volume(-1, 1, 0, width, 0, height);
         // Select The Projection Matrix
         glMatrixMode(GL_PROJECTION);
@@ -380,8 +389,8 @@ namespace OpenGL {
 
         // calculate ao
         glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
-        // if (doBlur) glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
-        // else glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        
+        //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         Matrix<4,4,float> proj = arg.canvas.GetViewingVolume()->GetProjectionMatrix();
         Matrix<4,4,float> unproj = proj.GetInverse();
         aoShader->SetUniform("proj", proj);
@@ -414,7 +423,6 @@ namespace OpenGL {
             CHECK_FOR_GL_ERROR();
             
             // blur in the y-direction
-            //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
             blurYShader->ApplyShader();
             CHECK_FOR_GL_ERROR();
@@ -424,8 +432,10 @@ namespace OpenGL {
         }
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        //mergeShader->SetTexture("scene",  whitetex);
-        mergeShader->SetTexture("scene",  scenetex);
+        if (merge)
+            mergeShader->SetTexture("scene",  scenetex);
+        else
+            mergeShader->SetTexture("scene",  whitetex);
         mergeShader->ApplyShader();
         CHECK_FOR_GL_ERROR();
         Quad();
@@ -444,6 +454,7 @@ namespace OpenGL {
         if (lighting) glEnable(GL_LIGHTING);
         if (blending) glEnable(GL_BLEND);
         if (texture)  glEnable(GL_TEXTURE_2D);
+        
     }
 
     void AmbientOcclusion::AttachTo(IRenderer& renderer) {
