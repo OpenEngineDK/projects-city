@@ -180,19 +180,24 @@ void ShadowMap::Handle(RenderingEventArg arg) {
         logger.info << "initialize NOW!" << logger.end;
         Initialize(arg);
         return;
-    } 
+    } else if (arg.renderer.GetCurrentStage() != IRenderer::RENDERER_PROCESS)
+        return;
 
     // We should compare the depth component only.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
     
-
+    
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0,0,0,1.0f);
 	
+
 	glEnable(GL_CULL_FACE);
     CHECK_FOR_GL_ERROR();
 
+    //return;
+
 	//glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
+    glBindTexture(GL_TEXTURE_2D,fb->GetDepthTexture()->GetID());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
 
 
 	//First step: Render from the light POV to a FBO, story depth values only
@@ -227,10 +232,13 @@ void ShadowMap::Handle(RenderingEventArg arg) {
 	setTextureMatrix();
 
     // Step 2
-	
+
 
 	// Now rendering from the camera POV, using the FBO to generate shadows
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
+
+
+
 	glViewport(0,0,w,h);
 	
 	//Enabling color write (previously disabled for light POV z-buffer rendering)
@@ -239,6 +247,9 @@ void ShadowMap::Handle(RenderingEventArg arg) {
 	// Clear previous frame values
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     CHECK_FOR_GL_ERROR();
+	glCullFace(GL_BACK);
+    
+
 
     light->lightTrans->SetPosition(light->lightCam->GetPosition());
 		
@@ -248,7 +259,7 @@ void ShadowMap::Handle(RenderingEventArg arg) {
 
     
        
-	glCullFace(GL_BACK);
+
 
     if (shadowsEnabled) {
         // shadowShader->SetUniform("ShadowAmount", shadowAmount);
@@ -267,6 +278,11 @@ void ShadowMap::Handle(RenderingEventArg arg) {
 	
     glUseProgramObjectARB(0);
     glActiveTextureARB(GL_TEXTURE0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE);
+
+    glDisable(GL_CULL_FACE);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     if (showFrustum) drawLightFrustum();
     if (showThumb) drawThumb(arg);
@@ -308,12 +324,8 @@ void ShadowMap::drawThumb(RenderingEventArg arg) {
     glDisable(GL_LIGHTING);
     glDisable(GL_COLOR_MATERIAL);
        
-
     glActiveTextureARB(GL_TEXTURE0);
-
     glBindTexture(GL_TEXTURE_2D,fb->GetDepthTexture()->GetID());
-    
-
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE);
     
 
@@ -325,7 +337,6 @@ void ShadowMap::drawThumb(RenderingEventArg arg) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
 
 
-    glActiveTextureARB(GL_TEXTURE0);
     glDisable(GL_TEXTURE_2D);
       
 }
@@ -408,9 +419,7 @@ void ShadowMap::AttachTo(IRenderer& renderer) {
 }
 
 ValueList ShadowMap::Inspection() {
-    ValueList values = Inspect(light->lightCam);
-    ValueList perspI = Inspect(light->lightPersp);
-    values.merge(perspI);
+    ValueList values;
 
     /* Shadows Enabled */ {
         RWValueCall<ShadowMap, bool> *v
@@ -485,6 +494,12 @@ ValueList ShadowMap::Inspection() {
         v->isColor = true;
         values.push_back(v);
     }
+
+    ValueList lightI = Inspect(light->lightCam);
+    ValueList perspI = Inspect(light->lightPersp);
+
+    values.merge(lightI);
+    values.merge(perspI);
 
     return values;
 }

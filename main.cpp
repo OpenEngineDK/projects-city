@@ -204,9 +204,26 @@ namespace OpenEngine {
  * method in Java.
  */
 int main(int argc, char** argv) {
-    SDLEnvironment *env = new SDLEnvironment(800, 600);
+    //SDLEnvironment *env = new SDLEnvironment(800, 600);
+    SDLEnvironment *env = new SDLEnvironment(1024, 768);
+
+    PerspectiveViewingVolume *persp = new PerspectiveViewingVolume(10,100);
+    Camera* lc = new Camera(*persp);
+
+    TransformationNode *lightTrans = new TransformationNode();
+    lightTrans->SetPosition(Vector<3,float>(100, 100, 100));
+    //lightTrans->Rotate(0, 0, 0);
+    PointLightNode *ln = new PointLightNode();
+    ln->diffuse = Vector<4,float>(.5,.5,.5,1);
+    lightTrans->AddNode(ln);
+
+
+    ShadowLight *sl = new ShadowLight(lc, persp,lightTrans);   
+    ShadowMap* sm = new ShadowMap(sl);
+
    
-    SimpleSetup* setup = new SimpleSetup("Example Project Title",env);
+    SimpleSetup* setup = new SimpleSetup("Example Project Title",env,sm); // With Shadowmap
+    //SimpleSetup* setup = new SimpleSetup("Example Project Title",env); // without
     setup->AddDataDirectory("projects/city/data/");
 
     // Print usage info.
@@ -222,23 +239,23 @@ int main(int argc, char** argv) {
 
     RenderStateNode *rsn = new RenderStateNode();
 
-    //rsn->EnableOption(RenderStateNode::TEXTURE);
-    rsn->EnableOption(RenderStateNode::COLOR_MATERIAL);
-    rsn->DisableOption(RenderStateNode::LIGHTING);
-    rsn->DisableOption(RenderStateNode::BACKFACE);
+    rsn->EnableOption(RenderStateNode::LIGHTING);
+    rsn->DisableOption(RenderStateNode::COLOR_MATERIAL);
+    rsn->EnableOption(RenderStateNode::SHADER);
+    //rsn->DisableOption(RenderStateNode::LIGHTING);
+    //rsn->DisableOption(RenderStateNode::BACKFACE);
     ISceneNode *root = rsn;
 
-    TransformationNode *lightTrans = new TransformationNode();
-    lightTrans->SetPosition(Vector<3,float>(100, 100, 100));
-    //lightTrans->Rotate(0, 0, 0);
-    PointLightNode *ln = new PointLightNode();
-    ln->diffuse = Vector<4,float>(.5,.5,.5,1);
-    lightTrans->AddNode(ln);
     root->AddNode(lightTrans);
+    //root->AddNode(sl);
+
+
+    
     
     TransformationNode* duckTrans = new TransformationNode();
-    duckTrans->SetPosition(Vector<3,float>(400, 0, 400));
-    duckTrans->SetScale(Vector<3,float>(1000.0));
+    duckTrans->SetPosition(Vector<3,float>(20, 0, -20));
+    duckTrans->SetScale(Vector<3,float>(50.0));
+    
     //IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("bunny/bun_zipper.ply");
     //IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("Collada/duck.dae");
     IModelResourcePtr duckRes = ResourceManager<IModelResource>::Create("dragon/dragon_vrip_res3.ply");
@@ -249,9 +266,18 @@ int main(int argc, char** argv) {
     root->AddNode(duckTrans);
     //ln->ambient = Vector<4,float>(1,1,1,1);
 
-    root->AddNode(node);
+    //root->AddNode(node); // Add the city
     setup->GetScene()->RemoveAllNodes();
     setup->GetScene()->AddNode(root);
+
+
+    TransformationNode* thingyTrans = new TransformationNode();
+    IModelResourcePtr thingyRes = ResourceManager<IModelResource>::Create("thingy/Hesty.dae");
+    thingyRes->Load();
+    thingyTrans->AddNode(thingyRes->GetSceneNode());
+    thingyRes->Unload();
+    root->AddNode(thingyTrans);
+    thingyTrans->SetRotation(Quaternion<float>(-PI/3.0, Vector<3,float>(1,0,0)));
 
 
 
@@ -259,8 +285,11 @@ int main(int argc, char** argv) {
 
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(.4,.4,.4,1));
     AmbientOcclusion* ao = new AmbientOcclusion();
+
+    
     ao->AttachTo(setup->GetRenderer());
 
+    
 
     // ant tweak bar
     AntTweakBar *atb = new AntTweakBar();
@@ -283,16 +312,28 @@ int main(int argc, char** argv) {
     atb->KeyEvent().Attach(*move);   
     atb->MouseButtonEvent().Attach(*move);
     atb->MouseMovedEvent().Attach(*move);
-     
-    atb->AddBar(new InspectionBar("duck",Inspect(duckTrans)));
+
+    atb->AddBar(new InspectionBar("model",Inspect(duckTrans)));     
     atb->AddBar(new InspectionBar("ambient occlusion", Inspect(ao)));
 
+    ValueList shadowI = Inspect(lc);
+    ValueList perspI = Inspect(persp);
+    shadowI.merge(perspI);
+    
+
+    atb->AddBar(new InspectionBar("thingy",Inspect(thingyTrans)));
+    atb->AddBar(new InspectionBar("shadow",Inspect(sm)));
+    atb->AddBar(new InspectionBar("renderer",Inspect(rsn)));
 
     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(*rsn)));
 
-
-    setup->GetCamera()->SetPosition(Vector<3,float>(0,200,-200));
+    setup->GetCamera()->SetPosition(Vector<3,float>(20,20,20));
     setup->GetCamera()->LookAt(0,0,0);
+
+    lc->SetPosition(Vector<3,float>(-10,20,10));
+    lc->LookAt(20,0,-20);
+
+    move->PushCamera(lc);
 
     setup->GetEngine().Start();
 

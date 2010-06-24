@@ -51,25 +51,40 @@ in the finished scene, we must decide if it is in a shadow or
 not. This is done by comparing the depth of the fragment with depth in
 the shadow map.
 
-\subsubsection{Lookup in the shadow map}
+%\subsubsection{Lookup in the shadow map}
 
 Before we can compare anything, we need to find the corresponding
 point in the shadow map. To calculate this, we need create a
 projection matrix that converts model coordinates into projective
 texture coordinates.
 
-\subsubsection{Comparing Depth}
-
-Bias matrix
+The first step is to convert model space to world space, this is done
+using the regular modeling matrix ($M$)that we also use for rendering
+the scene. The next step is to convert this to light space, using the
+lights view matrix ($V_{light}$). We convert this to screen space via
+the lights projection matrix ($P_{light}$). This will give us a
+coordinate in the $[-1,1] \times [-1,1]$ range. This is a problem, as
+texture space is in the range $[0,1] \times [0,1]$, so we add a bias
+matrix ($B$), that does this conversion.
 
 \begin{align*}
-  B = \begin{bmatrix}
-    0.5 & 0   & 0   & 0.5 \\
-    0   & 0.5 & 0   & 0.5 \\
-    0   & 0   & 0.5 & 0.5 \\
+  B &= \begin{bmatrix}
+    \frac{1}{2} & 0   & 0   & \frac{1}{2} \\
+    0   & \frac{1}{2} & 0   & \frac{1}{2} \\
+    0   & 0   & \frac{1}{2} & \frac{1}{2} \\
     0   & 0   & 0   & 1   \\
-  \end{bmatrix}
+  \end{bmatrix} \\
+  T &= BP_{light}V_{light}M
 \end{align*}
+
+
+
+%\subsubsection{Comparing Depth}
+
+
+
+%% -------------
+
 
 
 \subsection{Implementation}

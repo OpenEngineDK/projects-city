@@ -34,7 +34,7 @@ namespace OpenGL {
 
     AmbientOcclusion::AmbientOcclusion()
         : init(Initializer(*this)),
-          enabled(true),
+          enabled(false),
           doBlur(false),
           merge(true),
           radius(10.0),
@@ -317,6 +317,7 @@ namespace OpenGL {
 
     void AmbientOcclusion::Handle(RenderingEventArg arg) { 
         if (!enabled) return;
+        
         glBindTexture(GL_TEXTURE_2D, scene);
         CHECK_FOR_GL_ERROR();
         glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
