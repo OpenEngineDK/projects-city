@@ -69,7 +69,7 @@ in the finished scene, we must decide if it is in a shadow or
 not. This is done by comparing the depth of the fragment with depth in
 the shadow map.
 
-%\subsubsection{Lookup in the shadow map}
+\subsubsection*{Lookup in the shadow map}
 
 Before we can compare anything, we need to find the corresponding
 point in the shadow map. To calculate this, we need create a
@@ -95,7 +95,7 @@ matrix ($B$), that does this conversion.
   T &= BP_{light}V_{light}M
 \end{align*}
 
-%\subsubsection{Comparing Depth}
+\subsubsection*{Render shadow}
 
 Once we have the right point, all there is left is to compare the
 depth of the shadow map, and the coordinates $z$-component. When the
@@ -116,7 +116,7 @@ to visualise it.
 In figure \ref{fig:sceneshadow}, the scene is rendered using a single
 shadow map.
 
-
+\newpage
 %% -------------
 
 
@@ -126,7 +126,31 @@ Our implementation of shadow mapping is based on OpenGL 2.1 with
 shader language 1.20, and the framebuffer extension
 (\texttt{GL\_ARB\_framebuffer\_object}).
 
-\subsubsection{Lighting}
+% Shadow mapping could be implemented on older hardware without
+% shaders\cite{nv01}, but that requires specific extensions.
+
+% http://developer.nvidia.com/attach/6769
+
+\subsubsection*{Setup}
+
+The first step is to setup a framebuffer object (FBO) and a texture to
+contain the shadow map.
+
+Using the buildin support for FBO in OpenEngine, this becomes quite elegant:
+\begin{cppcode}
+void ShadowMap::generateShadowFBO(RenderingEventArg arg) {
+	int shadowMapWidth = SHADOW_MAP_RATIO * arg.canvas.GetWidth();
+	int shadowMapHeight = SHADOW_MAP_RATIO * arg.canvas.GetHeight();
+    IRenderer& renderer = arg.renderer;
+    Vector<2,int> dims(shadowMapWidth,shadowMapHeight);
+    fb = new FrameBuffer(dims,1,true);
+    renderer.BindFrameBuffer(fb);
+}
+\end{cppcode}
+
+
+
+\subsubsection*{Lighting}
 
 When we add vertex and fragment shaders to our pipeline, we loose all
 the fixed functions, so we need to implement our own lighting.

@@ -32,8 +32,6 @@ using namespace Geometry;
 using namespace Resources;
 using namespace Utils::Inspection;
 
-    //#define RENDER_WIDTH 800.0
-    //#define RENDER_HEIGHT 600.0
 #define SHADOW_MAP_RATIO 2
 
 
@@ -82,19 +80,12 @@ void ShadowMap::VisitTransformationNode(TransformationNode* node) {
 // Loading shader function
 
 void ShadowMap::generateShadowFBO(RenderingEventArg arg) {
-
-    int w = arg.canvas.GetWidth();
-    int h = arg.canvas.GetHeight();
-
-    
-	int shadowMapWidth = w * SHADOW_MAP_RATIO;
-	int shadowMapHeight = h * SHADOW_MAP_RATIO;
-	
+	int shadowMapWidth = SHADOW_MAP_RATIO * arg.canvas.GetWidth();
+	int shadowMapHeight = SHADOW_MAP_RATIO * arg.canvas.GetHeight();
 
     IRenderer& renderer = arg.renderer;
-    // int w = arg.canvas.GetWidth();
-    // int h = arg.canvas.GetHeight();
     Vector<2,int> dims(shadowMapWidth,shadowMapHeight);
+
     fb = new FrameBuffer(dims,1,true);
     renderer.BindFrameBuffer(fb);
 }
@@ -144,12 +135,6 @@ void ShadowMap::Initialize(RenderingEventArg arg) {
 
     generateShadowFBO(arg);
     
-
-    // FBO
-
-    //fboId = fb->GetID();
-
-
     // Shader
     shadowShader = ResourceManager<IShaderResource>::
         Create("projects/city/shaders/Shadow2.glsl");
@@ -183,17 +168,11 @@ void ShadowMap::Handle(RenderingEventArg arg) {
     } else if (arg.renderer.GetCurrentStage() != IRenderer::RENDERER_PROCESS)
         return;
 
-    // We should compare the depth component only.
-    
     
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0,0,0,1.0f);
-	
-
 	glEnable(GL_CULL_FACE);
     CHECK_FOR_GL_ERROR();
-
-    //return;
 
 	//glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
     glBindTexture(GL_TEXTURE_2D,fb->GetDepthTexture()->GetID());
@@ -233,12 +212,8 @@ void ShadowMap::Handle(RenderingEventArg arg) {
 
     // Step 2
 
-
 	// Now rendering from the camera POV, using the FBO to generate shadows
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
-
-
-
 	glViewport(0,0,w,h);
 	
 	//Enabling color write (previously disabled for light POV z-buffer rendering)
@@ -256,10 +231,6 @@ void ShadowMap::Handle(RenderingEventArg arg) {
     arg.renderer.ApplyViewingVolume(*(arg.canvas.GetViewingVolume()));
 
     glDisable(GL_POLYGON_OFFSET_FILL);
-
-    
-       
-
 
     if (shadowsEnabled) {
          shadowShader->SetUniform("ShadowAmount", shadowAmount);
