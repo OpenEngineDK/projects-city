@@ -69,17 +69,16 @@ independent post-processing effect. As a result the complexity of the
 algorithm only depends on the resolution of the screen.
 
 The basic idea behind screen space ambient occlusion is that the depth
-buffer can be viewed as a height map depicting the curvature of
-all the front-most visible geometry with respect to the eye
-position. Each two-dimensional position on the screen surface
-can then be translated into a three-dimensional point in screen space by
-means of the depth value. A finite number of rays within the hemisphere
-in the direction of the surface normal can then be traced using a
-technique called ray-marching. Ray-marching traces a ray by stepping
-along the direction of the ray. The step size is a fixed predermined
+buffer can be viewed as a height map depicting the curvature of all
+the front-most visible geometry with respect to the eye-position. Each
+two-dimensional position on the screen surface can then be translated
+into a three-dimensional point in screen space by means of the depth
+value. A finite number of rays within the hemisphere in the direction
+of the surface normal can then be traced using a technique called
+ray-marching. Ray-marching traces a ray by stepping along the
+direction of the ray. The step size is a fixed predermined
 value. Occluders are then detected by testing intersections with the
 height map determined by the depth buffer.
-\todo{describe unprojection}
 
 \subsection{Horizon-based Ambient Occlusion}
 \label{sec:hbao}
@@ -88,29 +87,43 @@ ray-marching in eye-space is unnecessary since our input data is
 two-dimensional \citep{hbao}. This is the underlying observation of
 the horizon-based ambient occlusion approach, where we trace entirely
 in image-space. For each fragment in the image plane we unproject the
-corresponding three-dimensional point $\mathbf{P}$ as described in
-section \ref{sec:ssao}. We then approximate the hemisphere by
+corresponding three-dimensional point $\mathbf{P}$. We then approximate the hemisphere by
 projecting a sphere centered in $\mathbf{P}$ back onto the image
 plane. On the resulting two-dimensional circle we randomly pick a
 finite number of uniformly distributed two-dimensional directions. In
 each of these directions we now determine a horizon line by stepping
-in image-space and compare depth values along the way. The horizon
+in image-space and comparing depth values along the way. The horizon
 line is then given by the vector going from $\mathbf{P}$ to the
 highest point on the height map along the traced line. The point is
 obtained by unprojecting the two-dimensional point with the lowest
 depth value as was done with the point $\mathbf{P}$. The concept of
 the horizon line is illustrated in figure \ref{fig:horizon}.
 \begin{figure}[h]
+  \label{fig:horizon}
   \centering
   \includegraphics[width=0.5\textwidth]{horizon}
-  \caption{Horizon stuff.}
-  \label{fig:horizon}
+  \caption{Concept of horizon line. The curved line illustrates how
+    the depth buffer can be viewed as a height map. A horizon line is
+    determined by locating the highest point within a fixed area.}
 \end{figure}
-To obtain an occlusion measure in a given direction we compare the
+To obtain an occlusion measure in a given direction we compare
 the horizon with the surface normal $\hat{n}$ in the point
-$\mathbf{P}$. This is done in the following way.
+$\mathbf{P}$. This is done by first determining the tangent to the
+surface normal as also depicted in figure \ref{fig:horizon}. Then both
+the angle of the tangent and horizon with respect to the xy-plane is
+brought into the interval $[-\pi,\pi]$ by the following equations
 
-\subsection{Applying the Ambient Occlusion Map}
+\begin{displaymath}
+  h(H)=\textrm{atan} (H.z / ||H.xy||)
+\end{displaymath}
+\begin{displaymath}
+  t(T)=\textrm{atan} (T.z / ||T.xy||)
+\end{displaymath}
+where $H$ is the horizon vector and $T$ is the tangent vector. A final
+ambient occlusion measure is then obtained by
+\begin{displaymath}
+  AO = \sin h - \sin t
+\end{displaymath}
 
 \subsection{Implementation}
 
@@ -358,8 +371,21 @@ simple one-line shader.
 
 \subsection{Results}
 
-The result of our ambient occlusion shader can be seen in figure
-\ref{fig:res}. 
+The results of our ambient occlusion shader can be seen in figure
+\ref{fig:res}. Without the bluring kernel the shadows seem very coarse
+grained. This is however greatly improved by the gaussian blur. It
+is worth noticing the nice shadows that are projected from the dragon
+down to the underlying surface. A downside is that the shadows have
+the same intensity all around the contour of the dragon. This is
+because we produce the shadows without the attenuation function, since
+it produced unexpected results. Unfortunately we did not figure out
+how to fix this problem. The algorithm runs at a reasonable rate when
+the number of rays are kept below 30 and the number of steps are kept
+below 16 or so. Also there is plenty of room for optimizations, by
+merging some of the shaders and hereby lowering the number of
+passes. One could also experiment with downsampling of the
+intermediate textures to further speed up computations. Unfortunately
+we did not have time to try out these optimizations.
 
 \begin{figure}[h]
 \label{fig:res}

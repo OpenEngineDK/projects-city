@@ -31,7 +31,7 @@ off. Ambient Occlusion can be enabled in the ambient occlusion
 inspector.
 
 \subsection{Files}
-
+\label{sec:files}
 A few notes about the many files in the project.
 
 First a list of the most important directories:
@@ -56,6 +56,18 @@ In the \texttt{projects/city/} directory, the following files are of interest:
     & The fragment and vertex shader for the shadow map \\ \hline
     \texttt{Renderers/OpenGL/ShadowMap.cpp} 
     & This is the renderer, it extends the default OpenGL Renderer. (see note) \\ \hline    
+    \texttt{Renderers/OpenGL/AmbientOcclusion.cpp} 
+    & The ambient occlusion post-process module. \\ \hline    
+    \texttt{shaders/surfaceNormals.glsl.\{frag,vert\}} 
+    & The fragment and vertex shader for the surface normal shader \\ \hline
+    \texttt{shaders/AmbientOcclusion.glsl.\{frag,vert\}} 
+    & The fragment and vertex shader for the ambient occlusion shader \\ \hline
+    \texttt{shaders/blurX.glsl.frag} 
+    & A fragment shader for the gaussian blur kernel \\ \hline
+    \texttt{shaders/blurY.glsl.frag} 
+    & A fragment shader for the gaussian blur kernel \\ \hline
+    \texttt{shaders/merge.glsl.frag} 
+    & The fragment shader for the merge shader \\ \hline
   \end{tabular}
 \end{center}
 
