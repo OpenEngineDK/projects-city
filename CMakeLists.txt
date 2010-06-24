@@ -80,4 +80,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 #  Extensions_GambitScheme
   Extensions_AntTweakBar
   Extensions_Inspection
+  Extensions_InspectionBar
 )

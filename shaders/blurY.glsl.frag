@@ -1,7 +1,7 @@
-uniform sampler2D ao, scene; 
+uniform sampler2D ao; 
 varying vec2 uv;
  
-const float blurSize = 1.0/800.0;
+const float blurSize = 1.0/(600*4);
  
 void main(void)
 {
@@ -19,6 +19,5 @@ void main(void)
    sum += texture2D(ao, vec2(uv.x, uv.y + 3.0*blurSize)) * 0.09;
    sum += texture2D(ao, vec2(uv.x, uv.y + 4.0*blurSize)) * 0.05;
  
-   gl_FragColor.r = sum.x;
-   gl_FragColor = texture2D(scene, uv) * sum.x;
+   gl_FragColor = vec4(sum.x);
 }

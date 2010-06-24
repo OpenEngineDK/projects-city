@@ -33,13 +33,85 @@ namespace OpenGL {
     using namespace Display;
 
     AmbientOcclusion::AmbientOcclusion()
-        : init(Initializer(*this))
+        : init(Initializer(*this)),
+          enabled(true),
+          doBlur(false),
+          radius(10.0),
+          linearAtt(0.8),
+          contrast(0.5),
+          rays(32.0),
+          bias(Math::PI / 6.0),
+          steps(5.0)
     {
 
     }
     
     AmbientOcclusion::~AmbientOcclusion() {
 
+    }
+
+
+
+    void AmbientOcclusion::SetRadius(float radius) {
+        this->radius = radius;
+    }
+
+    float AmbientOcclusion::GetRadius() {
+        return radius;
+    }
+
+    void AmbientOcclusion::SetLinearAttenuation(float linearAtt) {
+        this->linearAtt = linearAtt;
+    }
+
+    float AmbientOcclusion::GetLinearAttenuation() {
+        return linearAtt;
+    }
+
+    void AmbientOcclusion::SetContrast(float contrast) {
+        this->contrast = contrast;
+    }
+
+    float AmbientOcclusion::GetContrast() {
+        return contrast;
+    }
+
+    void AmbientOcclusion::SetNumOfRays(float rays) {
+        this->rays = rays;
+    }
+
+    float AmbientOcclusion::GetNumOfRays() {
+        return rays;
+    }
+    void AmbientOcclusion::SetNumOfSteps(float steps) {
+        this->steps = steps;
+    }
+
+    float AmbientOcclusion::GetNumOfSteps() {
+        return steps;
+    }
+    void AmbientOcclusion::SetAngleBias(float bias) {
+        this->bias = bias;
+    }
+
+    float AmbientOcclusion::GetAngleBias() {
+        return bias;
+    }
+
+    void AmbientOcclusion::SetEnabled(bool enabled) {
+        this->enabled = enabled;
+    }
+
+    bool AmbientOcclusion::IsEnabled() {
+        return enabled;
+    }
+
+    void AmbientOcclusion::SetBlur(bool doBlur) {
+        this->doBlur = doBlur;
+    }
+
+    bool AmbientOcclusion::GetBlur() {
+        return doBlur;
     }
 
     void AmbientOcclusion::VisitMeshNode(MeshNode* node) {
@@ -58,6 +130,21 @@ namespace OpenGL {
                 CHECK_FOR_GL_ERROR();
             }
         }
+
+        IDataBlock* n = gs->GetNormals().get();
+        if (n) {
+            glEnableClientState(GL_NORMAL_ARRAY);
+            CHECK_FOR_GL_ERROR();
+            if (n->GetID() != 0) {
+                glBindBuffer(GL_ARRAY_BUFFER, n->GetID());
+                glNormalPointer(GL_FLOAT, 0, 0);
+                CHECK_FOR_GL_ERROR();
+            } else {
+                glNormalPointer(GL_FLOAT, 0, n->GetVoidDataPtr());
+                CHECK_FOR_GL_ERROR();
+            }
+        }
+
 
         Indices* indices = mesh->GetIndices().get();
         GLsizei count = mesh->GetDrawingRange();
@@ -109,7 +196,7 @@ namespace OpenGL {
         glGenFramebuffersEXT(1, &fbo);
 
         // create normal texture (each rgb color represents a float3 vector)
-        ITexture2DPtr normtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 4));
+        normtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 4));
         normtex->SetFiltering(NONE);
         normtex->SetColorFormat(RGBA32F);
         normtex->SetMipmapping(false);
@@ -119,7 +206,7 @@ namespace OpenGL {
         normals = normtex->GetID();
 
         // create depth texture 
-        ITexture2DPtr depthtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 1));
+        depthtex = FloatTexture2DPtr(new Texture2D<float>(width, height, 1));
         depthtex->SetFiltering(NONE);
         depthtex->SetColorFormat(DEPTH);
         depthtex->SetMipmapping(false);
@@ -129,7 +216,7 @@ namespace OpenGL {
         depth = depthtex->GetID();
 
         // create ao texture 
-        ITexture2DPtr aotex = FloatTexture2DPtr(new Texture2D<float>(width, height, 1));
+        aotex = FloatTexture2DPtr(new Texture2D<float>(width, height, 1));
         aotex->SetFiltering(BILINEAR);
         aotex->SetColorFormat(LUMINANCE32F);
         aotex->SetMipmapping(false);
@@ -147,13 +234,25 @@ namespace OpenGL {
         arg.renderer.LoadTexture(blurtex);
         blur = blurtex->GetID();
 
-        ITexture2DPtr scenetex = UCharTexture2DPtr(new Texture2D<unsigned char>(width, height, 3));
+        scenetex = UCharTexture2DPtr(new Texture2D<unsigned char>(width, height, 3));
         scenetex->SetColorFormat(RGB);
         scenetex->SetMipmapping(false);
         scenetex->SetCompression(false);
         scenetex->SetWrapping(CLAMP_TO_EDGE);
         arg.renderer.LoadTexture(scenetex);
         scene = scenetex->GetID();
+
+        unsigned char* d = new unsigned char[3];
+        d[0] = 0xFF;
+        d[1] = 0xFF;
+        d[2] = 0xFF;
+        whitetex = UCharTexture2DPtr(new Texture2D<unsigned char>(1, 1, 3, d));        
+        whitetex->SetFiltering(NONE);
+        whitetex->SetColorFormat(RGB);
+        whitetex->SetMipmapping(false);
+        whitetex->SetCompression(false);
+        whitetex->SetWrapping(REPEAT);
+        arg.renderer.LoadTexture(scenetex);
 
         // Bind the fbo and attach normal and depth textures
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
@@ -167,14 +266,14 @@ namespace OpenGL {
         
         // create and load the shader
         normalShader = ResourceManager<IShaderResource>
-            ::Create("projects/city/shaders/AmbientOcclusion0.glsl");
+            ::Create("projects/city/shaders/SurfaceNormals.glsl");
         normalShader->Load();
 
         aoShader = ResourceManager<IShaderResource>
-            ::Create("projects/city/shaders/AmbientOcclusion1.glsl");
+            ::Create("projects/city/shaders/AmbientOcclusion.glsl");
         aoShader->Load();
         aoShader->SetTexture("normals", normtex);
-        //aoShader->SetTexture("scene",  scenetex);
+        aoShader->SetTexture("d", depthtex);
         
         blurXShader = ResourceManager<IShaderResource>
             ::Create("projects/city/shaders/blurX.glsl");
@@ -185,8 +284,12 @@ namespace OpenGL {
             ::Create("projects/city/shaders/blurY.glsl");
         blurYShader->Load();
         blurYShader->SetTexture("ao",  blurtex);
-        blurYShader->SetTexture("scene",  scenetex);
+        // blurYShader->SetTexture("scene",  scenetex);
 
+        mergeShader = ResourceManager<IShaderResource>
+            ::Create("projects/city/shaders/merge.glsl");
+        mergeShader->Load();
+        mergeShader->SetTexture("ao",  aotex);
     }
 
     void AmbientOcclusion::Quad() {
@@ -204,6 +307,7 @@ namespace OpenGL {
     }         
 
     void AmbientOcclusion::Handle(RenderingEventArg arg) { 
+        if (!enabled) return;
         glBindTexture(GL_TEXTURE_2D, scene);
         CHECK_FOR_GL_ERROR();
         glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
@@ -229,8 +333,6 @@ namespace OpenGL {
         arg.canvas.GetScene()->Accept(*this);
         CHECK_FOR_GL_ERROR();
         normalShader->ReleaseShader();
-
-        // do magic stuff (or setup quading matrices)
 
         // Vector<4,int> d(0, 0, width, height);
         // glViewport((GLsizei)d[0], (GLsizei)d[1], (GLsizei)d[2], (GLsizei)d[3]);
@@ -277,33 +379,58 @@ namespace OpenGL {
         glDisable(GL_TEXTURE_2D);
 
         // calculate ao
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        //glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
+        glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
+        // if (doBlur) glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
+        // else glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         Matrix<4,4,float> proj = arg.canvas.GetViewingVolume()->GetProjectionMatrix();
+        Matrix<4,4,float> unproj = proj.GetInverse();
         aoShader->SetUniform("proj", proj);
+        aoShader->SetUniform("unproj", unproj);
+        aoShader->SetTexture("normals", normtex);
+        aoShader->SetTexture("d", depthtex);
+
+        aoShader->SetUniform("sphereRad", radius);
+        aoShader->SetUniform("linearAtt", linearAtt);
+        aoShader->SetUniform("contrast", contrast);
+        aoShader->SetUniform("rays", rays);
+        aoShader->SetUniform("bias", bias);
+        aoShader->SetUniform("steps", steps);
+
         glClearColor(1.0,1.0,1.0,1.0);
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        glClear( GL_COLOR_BUFFER_BIT);
         aoShader->ApplyShader();
         CHECK_FOR_GL_ERROR();
         Quad();
         aoShader->ReleaseShader();
         CHECK_FOR_GL_ERROR();
        
-        // // blur in the x-direction
-        // glDrawBuffer(GL_COLOR_ATTACHMENT2_EXT);
-        // blurXShader->ApplyShader();
-        // CHECK_FOR_GL_ERROR();
-        // Quad();
-        // blurXShader->ReleaseShader();
-        // CHECK_FOR_GL_ERROR();
+        if (doBlur) {
+            // blur in the x-direction
+            glDrawBuffer(GL_COLOR_ATTACHMENT2_EXT);
+            blurXShader->ApplyShader();
+            CHECK_FOR_GL_ERROR();
+            Quad();
+            blurXShader->ReleaseShader();
+            CHECK_FOR_GL_ERROR();
+            
+            // blur in the y-direction
+            //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+            glDrawBuffer(GL_COLOR_ATTACHMENT1_EXT);
+            blurYShader->ApplyShader();
+            CHECK_FOR_GL_ERROR();
+            Quad();
+            blurYShader->ReleaseShader();
+            CHECK_FOR_GL_ERROR();     
+        }
 
-        // // blur in the y-direction
-        // glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        // blurYShader->ApplyShader();
-        // CHECK_FOR_GL_ERROR();
-        // Quad();
-        // blurYShader->ReleaseShader();
-        // CHECK_FOR_GL_ERROR();     
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        //mergeShader->SetTexture("scene",  whitetex);
+        mergeShader->SetTexture("scene",  scenetex);
+        mergeShader->ApplyShader();
+        CHECK_FOR_GL_ERROR();
+        Quad();
+        mergeShader->ReleaseShader();
+        CHECK_FOR_GL_ERROR();     
 
         // reset gl state
         glMatrixMode(GL_PROJECTION);

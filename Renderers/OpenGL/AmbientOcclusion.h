@@ -47,7 +47,12 @@ private:
     // framebuffer and texture magic
     unsigned int width, height;
     GLuint fbo, normals, depth, ao, scene, blur;
-    IShaderResourcePtr normalShader, aoShader, blurXShader, blurYShader;
+    ITexture2DPtr normtex, depthtex, aotex, whitetex, scenetex;
+    IShaderResourcePtr normalShader, aoShader, blurXShader, blurYShader, mergeShader;
+
+    bool enabled, doBlur;
+    float radius, linearAtt, contrast, rays, bias, steps;
+
     void Initialize(RenderingEventArg arg);
 
     void Quad();
@@ -60,6 +65,25 @@ public:
     void Handle(RenderingEventArg arg);
 
     void AttachTo(IRenderer& renderer);
+
+    void SetRadius(float radius);
+    float GetRadius();
+    void SetLinearAttenuation(float linearAtt);
+    float GetLinearAttenuation();
+    void SetContrast(float contrast);
+    float GetContrast();
+    void SetNumOfRays(float rays);
+    float GetNumOfRays();
+    void SetAngleBias(float bias);
+    float GetAngleBias();
+    void SetNumOfSteps(float steps);
+    float GetNumOfSteps();
+    
+    void SetEnabled(bool enabled);
+    bool IsEnabled();
+
+    void SetBlur(bool doBlur);
+    bool GetBlur();
 };
 
 } // NS OpenGL

@@ -32,6 +32,7 @@
 
 #include "InspectorBar.h"
 
+#include <Utils/InspectionBar.h>
 
 //#include <Utils/FPSSurface.h>
 #include <Display/InterpolatedViewingVolume.h>
@@ -81,6 +82,108 @@ using namespace OpenEngine::Script;
 
 using OpenEngine::Renderers::OpenGL::AmbientOcclusion;
 using OpenEngine::Renderers::OpenGL::ShadowMap;
+
+namespace OpenEngine {
+    namespace Utils{
+        namespace Inspection {
+
+            ValueList Inspect(AmbientOcclusion* ao) {
+                ValueList values;
+                {
+                    RWValueCall<AmbientOcclusion, bool> *v
+                        = new RWValueCall<AmbientOcclusion, bool>
+                        (*ao,
+                         &AmbientOcclusion::IsEnabled,
+                         &AmbientOcclusion::SetEnabled);
+                    v->name = "enable";
+                    values.push_back(v);
+                }
+                {
+                    RWValueCall<AmbientOcclusion, bool> *v
+                        = new RWValueCall<AmbientOcclusion, bool>
+                        (*ao,
+                         &AmbientOcclusion::GetBlur,
+                         &AmbientOcclusion::SetBlur);
+                    v->name = "blur AO";
+                    values.push_back(v);
+                }
+                {
+                    RWValueCall<AmbientOcclusion, float> *v
+                        = new RWValueCall<AmbientOcclusion, float>
+                        (*ao,
+                         &AmbientOcclusion::GetRadius,
+                         &AmbientOcclusion::SetRadius);
+                    v->name = "Radius";
+                    v->properties[MIN] = 0;
+                    v->properties[MAX] = 100;
+                    v->properties[STEP] = 0.1;
+                    values.push_back(v);
+                }
+                {
+                    RWValueCall<AmbientOcclusion, float> *v
+                        = new RWValueCall<AmbientOcclusion, float>
+                        (*ao,
+                         &AmbientOcclusion::GetLinearAttenuation,
+                         &AmbientOcclusion::SetLinearAttenuation);
+                    v->name = "linear attenuation";
+                    v->properties[MIN] = 0;
+                    v->properties[MAX] = 1;
+                    v->properties[STEP] = 0.1;
+                    values.push_back(v);
+                }
+                {
+                    RWValueCall<AmbientOcclusion, float> *v
+                        = new RWValueCall<AmbientOcclusion, float>
+                        (*ao,
+                         &AmbientOcclusion::GetContrast,
+                         &AmbientOcclusion::SetContrast);
+                    v->name = "contrast";
+                    v->properties[MIN] = 0;
+                    v->properties[MAX] = 1;
+                    v->properties[STEP] = 0.1;
+                    values.push_back(v);
+                }
+                {
+                    RWValueCall<AmbientOcclusion, float> *v
+                        = new RWValueCall<AmbientOcclusion, float>
+                        (*ao,
+                         &AmbientOcclusion::GetNumOfRays,
+                         &AmbientOcclusion::SetNumOfRays);
+                    v->name = "Number of rays";
+                    v->properties[MIN] = 1;
+                    v->properties[MAX] = 64;
+                    v->properties[STEP] = 1;
+                    values.push_back(v);
+                }
+                {
+                    RWValueCall<AmbientOcclusion, float> *v
+                        = new RWValueCall<AmbientOcclusion, float>
+                        (*ao,
+                         &AmbientOcclusion::GetNumOfSteps,
+                         &AmbientOcclusion::SetNumOfSteps);
+                    v->name = "Number of steps";
+                    v->properties[MIN] = 1;
+                    v->properties[MAX] = 50;
+                    v->properties[STEP] = 1;
+                    values.push_back(v);
+                }
+                {
+                    RWValueCall<AmbientOcclusion, float> *v
+                        = new RWValueCall<AmbientOcclusion, float>
+                        (*ao,
+                         &AmbientOcclusion::GetAngleBias,
+                         &AmbientOcclusion::SetAngleBias);
+                    v->name = "angle bias";
+                    v->properties[MIN] = 0;
+                    v->properties[MAX] = Math::PI;
+                    v->properties[STEP] = Math::PI/10.0;
+                    values.push_back(v);
+                }
+                return values;    
+            }
+        }
+    }
+}
 
 /**
  * Main method for the first quarter project of CGD.
@@ -170,6 +273,7 @@ int main(int argc, char** argv) {
     atb->MouseMovedEvent().Attach(*move);
      
     atb->AddBar(new InspectorBar("duck",Inspect(duckTrans)));
+    atb->AddBar(new InspectionBar("ambient occlusion", Inspect(ao)));
 
 
     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(*rsn)));
