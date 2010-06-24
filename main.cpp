@@ -46,9 +46,9 @@
 #include <Resources/ResourceManager.h>
 
 #include <Scene/VertexArrayTransformer.h>
-#include <Script/Scheme.h>
-#include <Script/ScriptBridge.h>
-#include <Network/IRCClient.h>
+//#include <Script/Scheme.h>
+//#include <Script/ScriptBridge.h>
+//#include <Network/IRCClient.h>
 
 #include <Utils/CameraTool.h>
 #include <Utils/ToolChain.h>
@@ -64,9 +64,9 @@
 #include <Resources/AssimpResource.h>
 
 // Game factory
-#include "Echo.h"
+//#include "Echo.h"
 //#include "MainUI.h"
-#include "IRCCity.h"
+//#include "IRCCity.h"
 
 #include "ShadowLight.h"
 
@@ -81,7 +81,7 @@ using namespace OpenEngine::Display;
 using namespace OpenEngine::Geometry;
 using namespace OpenEngine::Resources;
 
-using namespace OpenEngine::Script;
+//using namespace OpenEngine::Script;
 
 using OpenEngine::Renderers::OpenGL::AmbientOcclusion;
 using OpenEngine::Renderers::OpenGL::ShadowMap;
@@ -214,7 +214,8 @@ int main(int argc, char** argv) {
     lightTrans->SetPosition(Vector<3,float>(100, 100, 100));
     //lightTrans->Rotate(0, 0, 0);
     PointLightNode *ln = new PointLightNode();
-    ln->diffuse = Vector<4,float>(.5,.5,.5,1);
+    //ln->diffuse = Vector<4,float>(.5,.5,.5,1);
+    ln->ambient = Vector<4,float>(.5,.5,.5,1);
     lightTrans->AddNode(ln);
 
 

@@ -262,7 +262,7 @@ void ShadowMap::Handle(RenderingEventArg arg) {
 
 
     if (shadowsEnabled) {
-        // shadowShader->SetUniform("ShadowAmount", shadowAmount);
+         shadowShader->SetUniform("ShadowAmount", shadowAmount);
         // shadowShader->SetUniform("SkyColor",skyColor);
         // shadowShader->SetUniform("GroundColor",groundColor);
 

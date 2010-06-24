@@ -14,16 +14,16 @@ SET( PROJECT_SOURCES
   Building.h
   CityAnimator.cpp
   CityAnimator.h
-  Echo.h
-  Echo.cpp
+  # Echo.h
+  # Echo.cpp
 #  MainUI.h
  # MainUI.cpp
-  IRCCity.h
-  IRCCity.cpp
-  IRCCityBlock.h
-  IRCCityBlock.cpp
-  IRCCityBuilding.h
-  IRCCityBuilding.cpp
+  # IRCCity.h
+  # IRCCity.cpp
+  # IRCCityBlock.h
+  # IRCCityBlock.cpp
+  # IRCCityBuilding.h
+  # IRCCityBuilding.cpp
   Renderers/OpenGL/AmbientOcclusion.h
   Renderers/OpenGL/AmbientOcclusion.cpp
   Renderers/OpenGL/ShadowMap.h
@@ -71,9 +71,9 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   Extensions_SetupHelpers
   Extensions_GenericHandlers
   Extensions_FaceBuilder
-  Extensions_TinyScheme
-  Extensions_Sockets
-  Extensions_IRC
+#  Extensions_TinyScheme
+#  Extensions_Sockets
+#  Extensions_IRC
   Extensions_MeshUtils
   Extensions_OpenGLSelection
   Extensions_AssimpResource
