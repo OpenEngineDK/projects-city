@@ -113,6 +113,15 @@ namespace OpenEngine {
                     RWValueCall<AmbientOcclusion, bool> *v
                         = new RWValueCall<AmbientOcclusion, bool>
                         (*ao,
+                         &AmbientOcclusion::GetDrawNormals,
+                         &AmbientOcclusion::SetDrawNormals);
+                    v->name = "render normals";
+                    values.push_back(v);
+                }
+                {
+                    RWValueCall<AmbientOcclusion, bool> *v
+                        = new RWValueCall<AmbientOcclusion, bool>
+                        (*ao,
                          &AmbientOcclusion::GetMerge,
                          &AmbientOcclusion::SetMerge);
                     v->name = "merge AO";
@@ -187,7 +196,7 @@ namespace OpenEngine {
                     v->name = "angle bias";
                     v->properties[MIN] = 0;
                     v->properties[MAX] = Math::PI;
-                    v->properties[STEP] = Math::PI/10.0;
+                    v->properties[STEP] = 0.1;
                     values.push_back(v);
                 }
                 return values;    

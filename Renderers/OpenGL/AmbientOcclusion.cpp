@@ -36,13 +36,14 @@ namespace OpenGL {
         : init(Initializer(*this)),
           enabled(false),
           doBlur(false),
+          doNormals(false),
           merge(true),
-          radius(10.0),
+          radius(2.5),
           linearAtt(0.8),
-          contrast(0.5),
-          rays(16.0),
-          bias(Math::PI / 6.0),
-          steps(5.0)
+          contrast(0.7),
+          rays(8.0),
+          bias(Math::PI / 10.0),
+          steps(4.0)
     {
 
     }
@@ -121,6 +122,14 @@ namespace OpenGL {
 
     bool AmbientOcclusion::GetMerge() {
         return merge;
+    }
+
+    void AmbientOcclusion::SetDrawNormals(bool doNormals) {
+        this->doNormals = doNormals;
+    }
+
+    bool AmbientOcclusion::GetDrawNormals() {
+        return doNormals;
     }
 
     void AmbientOcclusion::VisitMeshNode(MeshNode* node) {
@@ -325,11 +334,10 @@ namespace OpenGL {
         glBindTexture(GL_TEXTURE_2D, 0);
 
         // bind normal vector frame buffer texture
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
-
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_LIGHTING);
+        if (!doNormals) {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+        }
         glEnable(GL_DEPTH_TEST);
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -343,36 +351,38 @@ namespace OpenGL {
         arg.canvas.GetScene()->Accept(*this);
         CHECK_FOR_GL_ERROR();
         normalShader->ReleaseShader();
+        if (doNormals) return;
 
-        Vector<4,int> d(0, 0, width, height);
-        glViewport((GLsizei)d[0], (GLsizei)d[1], (GLsizei)d[2], (GLsizei)d[3]);
-        OrthogonalViewingVolume volume(-1, 1, 0, width, 0, height);
-        // Select The Projection Matrix
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        CHECK_FOR_GL_ERROR();
-        // Reset The Projection Matrix
-        glLoadIdentity();
-        CHECK_FOR_GL_ERROR();
-        // Setup OpenGL with the volumes projection matrix
-        Matrix<4,4,float> projMatrix = volume.GetProjectionMatrix();
-        float arr[16];
-        projMatrix.ToArray(arr);
-        glMultMatrixf(arr);
-        CHECK_FOR_GL_ERROR();
-        // Select the modelview matrix
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        CHECK_FOR_GL_ERROR();
-        // Reset the modelview matrix
-        glLoadIdentity();
-        CHECK_FOR_GL_ERROR();
-        // Get the view matrix and apply it
-        Matrix<4,4,float> matrix = volume.GetViewMatrix();
-        float f[16] = {0};
-        matrix.ToArray(f);
-        glMultMatrixf(f);
-        CHECK_FOR_GL_ERROR();
+        // Vector<4,int> d(0, 0, width, height);
+        // glViewport((GLsizei)d[0], (GLsizei)d[1], (GLsizei)d[2], (GLsizei)d[3]);
+        // OrthogonalViewingVolume volume(-1, 1, 0, width, 0, height);
+
+        // // Select The Projection Matrix
+        // glMatrixMode(GL_PROJECTION);
+        // glPushMatrix();
+        // CHECK_FOR_GL_ERROR();
+        // // Reset The Projection Matrix
+        // glLoadIdentity();
+        // CHECK_FOR_GL_ERROR();
+        // // Setup OpenGL with the volumes projection matrix
+        // Matrix<4,4,float> projMatrix = volume.GetProjectionMatrix();
+        // float arr[16];
+        // projMatrix.ToArray(arr);
+        // glMultMatrixf(arr);
+        // CHECK_FOR_GL_ERROR();
+        // // Select the modelview matrix
+        // glMatrixMode(GL_MODELVIEW);
+        // glPushMatrix();
+        // CHECK_FOR_GL_ERROR();
+        // // Reset the modelview matrix
+        // glLoadIdentity();
+        // CHECK_FOR_GL_ERROR();
+        // // Get the view matrix and apply it
+        // Matrix<4,4,float> matrix = volume.GetViewMatrix();
+        // float f[16] = {0};
+        // matrix.ToArray(f);
+        // glMultMatrixf(f);
+        // CHECK_FOR_GL_ERROR();
         
         // setup gl quad state
         GLboolean depth    = glIsEnabled(GL_DEPTH_TEST);
@@ -437,6 +447,7 @@ namespace OpenGL {
             mergeShader->SetTexture("scene",  scenetex);
         else
             mergeShader->SetTexture("scene",  whitetex);
+
         mergeShader->ApplyShader();
         CHECK_FOR_GL_ERROR();
         Quad();
@@ -444,12 +455,12 @@ namespace OpenGL {
         CHECK_FOR_GL_ERROR();     
 
         // reset gl state
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        CHECK_FOR_GL_ERROR();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-        CHECK_FOR_GL_ERROR();
+        // glMatrixMode(GL_PROJECTION);
+        // glPopMatrix();
+        // CHECK_FOR_GL_ERROR();
+        // glMatrixMode(GL_MODELVIEW);
+        // glPopMatrix();
+        // CHECK_FOR_GL_ERROR();
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, texenv);
         if (depth)    glEnable(GL_DEPTH_TEST);
         if (lighting) glEnable(GL_LIGHTING);
