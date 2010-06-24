@@ -82,6 +82,7 @@ height map determined by the depth buffer.
 \todo{describe unprojection}
 
 \subsection{Horizon-based Ambient Occlusion}
+\label{sec:hbao}
 A further performance improvement is achieved by realising that
 ray-marching in eye-space is unnecessary since our input data is
 two-dimensional \citep{hbao}. This is the underlying observation of
@@ -213,10 +214,10 @@ normals and the interpolated vertex normals.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=4cm]{hardnormals}
-  \includegraphics[width=4cm]{softnormals}
-  \caption{Rendering of the normal map. To the left using hard
-    normals. To the right using interpolated vertex normals.}
+  \includegraphics[width=6cm]{hardnormals}
+  \includegraphics[width=6cm]{softnormals}
+  \caption{Rendering of the normal map. To the left: Using hard
+    normals. To the right: Using interpolated vertex normals.}
   \label{fig:normals}
 \end{figure}
 \subsubsection*{Producing the ambient occlusion map}  
@@ -248,7 +249,19 @@ where the first two lines are the surface normal texture and the depth
 buffer texture. The third line is the projection matrix used to render
 the original scene and the last line is the inverted projection
 matrix. These two matrices are used for converting between window
-coordinates and eye-space coordinates.
+coordinates and eye-space coordinates. This is done in the following
+helper functions
+\begin{cppcode}
+  vec3 unproject(vec2 pos, float depth) {
+    vec4 res = unproj * vec4(pos, depth, 1.0);
+    return res.xyz / res.w;
+  }
+  
+  vec2 project(vec3 pos) {
+    vec4 res = proj * vec4(pos, 1.0);
+    return res.xy / res.w;
+  }
+\end{cppcode}
 
 Next we have the following user definable variables to affect the
 behaviour of the algorithm.
@@ -269,12 +282,95 @@ These variables represent
 \end{itemize}
 respectively.
 
+We first project the sphere radius onto the image plane. This is done
+by the following line of code
+\begin{cppcode}
+  float circleRad = length(winPos - project(fragPos + vec3(sphereRad, 0.0, 0.0))); 
+\end{cppcode}
+where winPos is the window position of the current fragment and
+fragPos is the unprojection of winPos.  The main part of the algorithm
+consists of an outer for loop iterating over the number of rays. The
+angles of the rays are uniformly distributed. An inner loop then
+traces each ray by taking a predefined number of steps on the ray and
+unproject each two-dimensional position on the way. The inner loop
+looks as follows
+\begin{cppcode}
+  for (float j = 0.0; j < steps; j = j + 1.0) {
+    pos += stepRay;
+    vec3 new = unproject(pos, shadow2D(d, vec3(win2uv(pos), 0.0)).x);
+    if (new.z < horizon.z) {
+      horizon = new;
+    }
+  }
+\end{cppcode}
+where pos has been initialized to the window position of the current
+fragment and stepRay is a two-dimensional vector pointing in the
+direction of the current ray and has length corresponding to the
+circle radius normalized by the number of steps. When the loop
+terminates the horizon vector should contain the eye space position of
+the ``highest'' point on the height map defined by the depth
+buffer. The actual horizon line can then be computed by
+\begin{cppcode}
+  horizon = horizon - fragPos;
+\end{cppcode}
+We now have the information to compute the contribution measure as
+described in section \ref{sec:hbao}. This is done in the following lines
+\begin{cppcode}
+  // calculate tangent to the surface normal
+  horizon = normalize(horizon);
+  vec3 tan   = vec3(1,0,0);
+  vec3 bitan = normalize(cross(normal, tan));
+  tan        = normalize(cross(bitan, normal));
+  
+  // calculate angles in [-PI; PI]
+  float hAngle = atan(horizon.z / length(horizon.xy));
+  float tAngle = atan(tan.z / length(tan.xy)) + bias;
+  
+  // final ao contribution of this direction
+  ao += (sin(hAngle) - sin(tAngle));
+\end{cppcode}
+where the upper part calculates the tangent to the surface normal, the
+middle part places the angles in the interval $[-\pi,\pi]$, and the
+last line accumulates the occlusion measure.
+
+When we are done accumulating the occlusion contributions from each
+ray we produce a final output value by averaging over the number of
+rays.
+\begin{cppcode}
+  gl_FragColor = vec4(1.0 - (ao/rays) * contrast);
+\end{cppcode}
+We now have a value that will shade the corresponding pixel in the
+original scene image by multiplying the two values.
 
 \subsubsection*{Applying the ambient occlusion map}
-
+Before applying the ambient occlusion map, we perform a simple gaussian
+blur to soften the shadows. This is done in two stages, first a blur
+in the x-direction and then a blur in the y-direction. We use the same
+technique of drawing a quad as before to activate the shaders. The
+shaders themselves are pretty much self-explanatory so it is
+unnecessary to cover them in further detail. An important thing to
+mention is that the gaussian blur should be replaced with a bilateral
+filter, that would account for large differences in depth values to
+avoid bleeding across edges. The result of the blur kernel is finally
+combined with the original image by multiplication of the pixel value
+with the corresponding ambient occlusion value. This is done in a very
+simple one-line shader.
 
 \subsection{Results}
-Demo!
+
+The result of our ambient occlusion shader can be seen in figure
+\ref{fig:res}. 
+
+\begin{figure}[h]
+\label{fig:res}
+  \centering
+  \includegraphics[width=6cm]{noao}
+  \includegraphics[width=6cm]{aonoblur}
+  \includegraphics[width=6cm]{aoblur}
+  \caption{Our ambient occlusion at work. Upper left: Without ambient
+    occlusion. Upper right: With ambient occlusion but no blur
+    kernel. Bottom: With both ambient occlusion and gaussian blur kernel.}
+\end{figure}
 
 %%% Local Variables: 
 %%% mode: latex
