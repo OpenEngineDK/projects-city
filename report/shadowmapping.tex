@@ -3,15 +3,24 @@
 
 Shadow Mapping is a image-based shadowing technique.
 
-The technique was first described in \cite{lance78}.
+% The technique was first described in \cite{lance78}.
 
 In 1985, Pixar used shadow mapping to create the video Luxo Jr. This
-non real-time video was extremely impressive at its time.
-\todoPtx{stuff}
-In 2001 at Macworld Expo Japan, Steve Jobs shows a real-time version
-using OpenGL.
+non real-time video was extremely impressive at its time. Especially
+because of the shadows. 16 years later, in 2001 at Macworld Expo
+Japan, Steve Jobs shows a real-time version of Luxo Jr. with the
+exact same scene rendered using OpenGL.
 
-\todoPtx{more bla.bla}
+In figure \ref{fig:scene} a small scene rendered without shadows can
+be seen. Later when shadow mapping have been added, it is clear to see
+how much difference simple shadows make.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{gfx/scenenoshadow}  
+  \caption{Scene Without Shadows}
+  \label{fig:scene}
+\end{figure}
 
 Shadow Mapping is a two-pass algorithm. The first step is to create
 the ``Shadow Map'' which describes the scene from the light sources
@@ -42,9 +51,18 @@ the depth, so the rendering can be speed up be disabling textures,
 lighting, colors and more. Its also convenient to disable front faces
 to avoid self-shadowing. % bla bla?
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{gfx/shadowmap}  
+  \caption{Shadow Map}
+  \label{fig:shadowmap}
+\end{figure}
+
+In figure \ref{fig:shadowmap}, the shadow map for the scene in figure
+\ref{fig:scene} is shown.
 
 \subsection{Rendering the Scene}
-\todoPtx{Beskriv step 2}
+
 
 The next step is to render the scene with shadows. For each fragment
 in the finished scene, we must decide if it is in a shadow or
@@ -77,17 +95,36 @@ matrix ($B$), that does this conversion.
   T &= BP_{light}V_{light}M
 \end{align*}
 
-
-
 %\subsubsection{Comparing Depth}
 
+Once we have the right point, all there is left is to compare the
+depth of the shadow map, and the coordinates $z$-component. When the
+value in the shadow map is largest, it means that something is closer
+to the light source, than the fragment we are processing.
+
+\todoPtx{Kunne skrives bedre...}
+Now we know if the fragment is in shadow, and change the color
+to visualise it.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{gfx/scenewithshadow}  
+  \caption{Scene with shadows}
+  \label{fig:sceneshadow}
+\end{figure}
+
+In figure \ref{fig:sceneshadow}, the scene is rendered using a single
+shadow map.
 
 
 %% -------------
 
 
-
 \subsection{Implementation}
+
+Our implementation of shadow mapping is based on OpenGL 2.1 with
+shader language 1.20, and the framebuffer extension
+(\texttt{GL\_ARB\_framebuffer\_object}).
 
 \subsubsection{Lighting}
 
