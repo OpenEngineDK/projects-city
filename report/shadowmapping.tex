@@ -3,7 +3,8 @@
 
 Shadow Mapping is a image-based shadowing technique.
 
-% The technique was first described in \cite{lance78}.
+The technique was first described in \citep{lance78}, and have since
+then been using quite a lot.
 
 In 1985, Pixar used shadow mapping to create the video Luxo Jr. This
 non real-time video was extremely impressive at its time. Especially
@@ -126,10 +127,10 @@ Our implementation of shadow mapping is based on OpenGL 2.1 with
 shader language 1.20, and the framebuffer extension
 (\texttt{GL\_ARB\_framebuffer\_object}).
 
-% Shadow mapping could be implemented on older hardware without
-% shaders\cite{nv01}, but that requires specific extensions.
+Shadow mapping could be implemented on older hardware without
+shaders \citep{nv01}, but that requires specific extensions, but are
+outside the topic of this course.
 
-% http://developer.nvidia.com/attach/6769
 
 \subsubsection*{Setup}
 
@@ -223,12 +224,79 @@ select the last texture unit, and hope no one is using it.
 }
 \end{cppcode}
 
+When this is done, we just need to render the scene to screen using a
+shadow map shader.
 
+In the vertex shader, the only thing we need to do, is multiply the
+vertex with our transformation matrix.
+
+\begin{cppcode}
+varying vec4 ShadowCoord;
+
+void main(void) {
+    ShadowCoord = gl_TextureMatrix[7] * gl_Vertex;
+    gl_Position = ftransform();
+}
+\end{cppcode}
+
+In the fragment we do the lookup, and changes the color if the
+fragment is in shadow.
+
+\begin{cppcode}  
+uniform sampler2DShadow ShadowMap;
+uniform float ShadowAmount;
+varying vec4 ShadowCoord;
+
+float lookup(float x, float y) {
+    float d = shadow2DProj(ShadowMap,ShadowCoord + vec4(x,y,0,0)).r;
+    return d < 1.0 ? ShadowAmount : 1.0;
+}
+
+void main() {
+    vec4 color;
+
+    color = gl_Color;
+
+    float shadow = lookup(0.0, 0.0);
+    color *= shadow;
+
+    color.a = 1.0;
+    gl_FragColor = color;
+}
+
+\end{cppcode}
+
+This is the most simple version, where we use \texttt{shadow2DProj} to
+find and compare the depth value in the shadow map. if
+\texttt{shadow2DProj} returns 1.0, it means that the fragment is lit,
+otherwise its in shadow.
+
+\texttt{lookup} takes an offset, so we can use the function to make
+anti-aliasing. We do this by looking at the neighboring pixels, and
+dividing by the number of pixels we looked at.
+
+\begin{cppcode}
+    float sd=0.017;
+    float shadow = lookup(0.0, 0.0);
+    shadow += lookup( sd,  sd);
+    shadow += lookup( sd, -sd);
+    shadow += lookup(-sd,  sd);
+    shadow += lookup(-sd, -sd);
+    shadow += lookup(0.0, -sd);
+    shadow += lookup(0.0,  sd);
+    shadow += lookup(-sd, 0.0);
+    shadow += lookup( sd, 0.0);
+    shadow /= 9.0;
+\end{cppcode}
+
+This gives more smooth edges on the shadows.
 
 \subsubsection*{Lighting}
 
 When we add vertex and fragment shaders to our pipeline, we loose all
-the fixed functions, so we need to implement our own lighting.
+the fixed functions, so we need to implement our own lighting. 
+
+\todoPtx{skriv om light?}
 
 \subsection{Limitations}
 
@@ -236,8 +304,11 @@ Shadow mapping is a technique for adding shadows in projection based \todoPtx{fi
 3D rendering. As such, it is limited by what is possible with projections.
 
 One of these is that we cant have a field of view larger than 180
-degrees\todoPtx{reference}. Therefor shadow mapping wont work with point
-light sources.
+Therefor shadow mapping wont work with point light sources if they are
+placed between objects. A way to fix this would be to render multiple
+shadow maps per light source, but that makes it more expensive.
+
+\todoPtx{more limits}
 
 \subsection{Future Work}
 

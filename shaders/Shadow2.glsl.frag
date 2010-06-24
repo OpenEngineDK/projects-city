@@ -9,7 +9,8 @@ varying float LightDistance;
 varying vec4 Diffuse, Ambient, GlobalAmbient;
 
 float lookup(float x, float y) {
-    return shadow2DProj(ShadowMap,ShadowCoord + vec4(x,y,0,0)).r < 1.0 ? ShadowAmount : 1.0;
+    float d = shadow2DProj(ShadowMap,ShadowCoord + vec4(x,y,0,0)).r;
+    return d < 1.0 ?  ShadowAmount : 1.0;
 }
 
 
@@ -18,7 +19,7 @@ void main() {
 
     float sd=0.017;
 
-    float shadow = lookup(0.0,0.0);
+    float shadow = lookup(0.0, 0.0);
     shadow += lookup( sd,  sd);
     shadow += lookup( sd, -sd);
     shadow += lookup(-sd,  sd);
@@ -49,5 +50,6 @@ void main() {
     color.a = 1.0;
 
   	gl_FragColor =	 color;
+
     
 }

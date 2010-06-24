@@ -244,7 +244,7 @@ void ShadowMap::Handle(RenderingEventArg arg) {
     glEnable(GL_TEXTURE_2D);
 
     if (showFrustum) drawLightFrustum();
-    if (1 || showThumb) drawThumb(arg);
+    if (showThumb) drawThumb(arg);
 }    
 void ShadowMap::drawThumb(RenderingEventArg arg) {
     int w = arg.canvas.GetWidth();
