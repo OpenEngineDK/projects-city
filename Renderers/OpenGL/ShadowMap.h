@@ -60,7 +60,7 @@ class ShadowMap : public RenderingView{
 
     void generateShadowFBO(RenderingEventArg);
 
-    void setTextureMatrix();
+    void SetTextureMatrix();
 
     bool shadowsEnabled;
     float shadowAmount;

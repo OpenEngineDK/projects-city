@@ -44,8 +44,8 @@ ShadowMap::ShadowMap(ShadowLight* l)
     groundColor = Vector<3,float>(0.0);
     showThumb = false;
     showFrustum = true;
-    poff = 1.0f;
-    punits = 10.0f;
+    poff = 1.1f;
+    punits = 4.0f;
 }
 
     
@@ -92,31 +92,21 @@ void ShadowMap::generateShadowFBO(RenderingEventArg arg) {
 
 
 
-void ShadowMap::setTextureMatrix() {
-    
+void ShadowMap::SetTextureMatrix() {    
     IViewingVolume* vv = light->lightCam;
-
     Matrix<4,4,float> B(.5, .0, .0,  .0,
                         .0, .5, .0,  .0,
                         .0, .0, .5,  .0,
                         .5, .5, .5, 1.0);
-    //B.Transpose();
     Matrix<4,4,float> Vl = vv->GetViewMatrix();
-    //Vl.Transpose();
-    Matrix<4,4,float> Pl = vv->GetProjectionMatrix();
-    //Pl.Transpose();
-    
+    Matrix<4,4,float> Pl = vv->GetProjectionMatrix();    
     Matrix<4,4,float> T = Vl*Pl*B; // The order is reversed T = B*Pl*Vl 
-    //Matrix<4,4,float> T = B*Pl*Vl; // The order is reversed T = B*Pl*Vl 
                                    // M is implicit (we add M in VisitTransformationNode)
-    //T.Transpose();
     float T_arr[16];
     T.ToArray(T_arr);
 	
 	glMatrixMode(GL_TEXTURE);
-	glActiveTextureARB(GL_TEXTURE7);	
-	glLoadIdentity();
-    
+	glActiveTextureARB(GL_TEXTURE7);
     glLoadMatrixf(T_arr);
 	
 	// Go back to normal matrix mode
@@ -146,7 +136,7 @@ void ShadowMap::MakeMap(RenderingEventArg arg) {
 
 
     glEnable(GL_DEPTH_TEST);
-	glClearColor(0,0,0,1.0f);
+	
 	glEnable(GL_CULL_FACE);
     CHECK_FOR_GL_ERROR();
 
@@ -179,14 +169,12 @@ void ShadowMap::MakeMap(RenderingEventArg arg) {
     glCullFace(GL_FRONT);
 
     // Draw the scene
-    arg.canvas.GetScene()->Accept(*this); return;
+    arg.canvas.GetScene()->Accept(*this); 
 
     // Remember to reset some of the state!
     glDisable(GL_POLYGON_OFFSET_FILL);
     glDisable(GL_CULL_FACE);
     CHECK_FOR_GL_ERROR();
-
-
 }
 
 void ShadowMap::Handle(RenderingEventArg arg) {
@@ -207,9 +195,8 @@ void ShadowMap::Handle(RenderingEventArg arg) {
     
     MakeMap(arg);
 
-
-	//Save modelview/projection matrice into texture7, also add a biais
-	setTextureMatrix();
+	//Save modelview/projection matrice into texture7, also add a bias
+	SetTextureMatrix();
 
     // Step 2
 
@@ -222,27 +209,26 @@ void ShadowMap::Handle(RenderingEventArg arg) {
 	
 	// Clear previous frame values
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    CHECK_FOR_GL_ERROR();
 	glCullFace(GL_BACK);
     
+    // Update the position of GL_LIGHT0 to the same as the viewingvolume.
+    light->Update();    
 
-
-    light->lightTrans->SetPosition(light->lightCam->GetPosition());
-		
+    // Set the camera
     arg.renderer.ApplyViewingVolume(*(arg.canvas.GetViewingVolume()));
     
-
+    // We need to setup the texture for depth compare
     glBindTexture(GL_TEXTURE_2D,fb->GetDepthTexture()->GetID());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
 
-
-
+    // Set uniforms, and set the shader program
     if (shadowsEnabled) {
         shadowShader->SetUniform("ShadowAmount", shadowAmount);
         shadowShader->ApplyShader();
     }
    
-    arg.canvas.GetScene()->Accept(*this); return;
+    // Render the scene
+    arg.canvas.GetScene()->Accept(*this); 
 
     if (shadowsEnabled)
         shadowShader->ReleaseShader();

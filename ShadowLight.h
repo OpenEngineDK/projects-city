@@ -28,6 +28,7 @@ public:
     Light *light;
 
     ShadowLight(Camera* lc, PerspectiveViewingVolume* p, TransformationNode* t, Light* l);
+    void Update();
 };
 
 

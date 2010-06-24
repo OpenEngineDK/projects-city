@@ -8,3 +8,7 @@ ShadowLight::ShadowLight(Camera* lc, PerspectiveViewingVolume* p, Transformation
     
     
       }
+
+void ShadowLight::Update() {
+        lightTrans->SetPosition(lightCam->GetPosition());
+}
