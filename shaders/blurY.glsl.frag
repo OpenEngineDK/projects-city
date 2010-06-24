@@ -1,7 +1,7 @@
 uniform sampler2D ao; 
 varying vec2 uv;
  
-const float blurSize = 1.0/(600*4);
+const float blurSize = 1.0/(600.0*4.0);
  
 void main(void)
 {
