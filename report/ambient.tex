@@ -190,15 +190,85 @@ applied. The following lines of code initiates the rendering of the normals.
   CHECK_FOR_GL_ERROR();
   normalShader->ReleaseShader();
 \end{cppcode} 
+The body of the vertex shader is given below
+\begin{cppcode}
+  eyePos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+  gl_Position = ftransform();
+  normal = normalize(gl_NormalMatrix * gl_Normal);
+\end{cppcode}
+This is a standard vertex shader transforming the vertex and the
+vertex normal into eye space. The interesting part lies in the
+fragment shader which is given by the oneliner below
+\begin{cppcode}
+  gl_FragColor.rgb = normalize(cross(dFdx(eyePos), dFdy(eyePos)));
+\end{cppcode}
+This is a nice trick for producing the correct surface
+normals instead of the interpolated ones. Here we compute the
+derivatives of the varying vertex coordinates in eyespace
+with respect to x and y, respectively. The cross product between these
+vectors is then a new vector perpendicular to the original triangle
+given in eye space coordinates, hence a surface normal. Figure
+\ref{fig:normals} illustrates the difference between the surface
+normals and the interpolated vertex normals.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=4cm]{hardnormals}
+  \includegraphics[width=4cm]{softnormals}
+  \caption{Rendering of the normal map. To the left using hard
+    normals. To the right using interpolated vertex normals.}
+  \label{fig:normals}
+\end{figure}
 \subsubsection*{Producing the ambient occlusion map}  
 When the surface normals and the depth buffer have been obtained in
-textures we can now proceed with the actual ambient occlusion
+textures, we can proceed with the actual ambient occlusion
 algorithm. The algorithm is written in a single shader and operates on
-every pixel in the normal and depth textures. In order to activate the
-shader we initialize OpenGL to orthographic projection, push the
-identity matrix on the model view stack, and simply draw a quad
-covering the entire screen.
+each pixel of the normal and depth textures. In order to activate the
+shader we simply draw a quad where each vertex has uv coordinates
+$(0,0), (0,1), (1,1), (1,0)$, respectively. The vertex coordinates are
+unimportant since we calculate these from the uv coordinates in the
+vertex shader. The body consists of the following two lines
+\begin{cppcode}
+  uv = gl_MultiTexCoord0.xy;
+  gl_Position = vec4((uv * 2.0) - vec2(1.0,1.0), 0.0, 1.0);
+\end{cppcode}
+which simply transform the uv coordinates lying in $[0,1]$ into window
+coordinates lying in $[-1,1]$.
+
+The fragment shader is where all the heavy work is carried out. There
+several uniforms which affects the resulting output. First of all the
+following uniforms are required
+\begin{cppcode}
+  uniform sampler2D normals;
+  uniform sampler2DShadow d;
+  uniform mat4 proj;
+  uniform mat4 unproj;
+\end{cppcode}
+where the first two lines are the surface normal texture and the depth
+buffer texture. The third line is the projection matrix used to render
+the original scene and the last line is the inverted projection
+matrix. These two matrices are used for converting between window
+coordinates and eye-space coordinates.
+
+Next we have the following user definable variables to affect the
+behaviour of the algorithm.
+\begin{cppcode}
+  uniform float sphereRad;
+  uniform float contrast;
+  uniform float rays;
+  uniform float steps;
+  uniform float bias;
+\end{cppcode}
+These variables represent
+\begin{itemize}
+\item the radius of the sphere in which to search for occluders,
+\item the contrast of the shadows,
+\item the number of rays to trace in image space,
+\item the number of steps to take when sampling in each ray direction,
+\item the angle bias, 
+\end{itemize}
+respectively.
+
 
 \subsubsection*{Applying the ambient occlusion map}
 
