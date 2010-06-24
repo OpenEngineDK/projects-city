@@ -294,7 +294,58 @@ This gives more smooth edges on the shadows.
 When we add vertex and fragment shaders to our pipeline, we loose all
 the fixed functions, so we need to implement our own lighting. 
 
-\todoPtx{skriv om light?}
+In the vertex shader we creates some varying, so we can create nice
+per pixel lighting.
+
+\begin{cppcode}
+varying vec3 Normal, LightDir, HalfVector;
+varying float LightDistance;
+varying vec4 Diffuse, Ambient, GlobalAmbient;
+
+void main(void) {
+    vec4 ecPosition = gl_ModelViewMatrix * gl_Vertex;
+    vec3 aux = vec3(gl_LightSource[0].position - ecPosition);
+
+    Normal = normalize(gl_NormalMatrix * gl_Normal);
+    
+    LightDir = normalize(aux);
+    LightDistance = length(aux);
+    HalfVector = normalize(gl_LightSource[0].halfVector.xyz);
+    
+    Diffuse = gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
+    Ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
+    GlobalAmbient = gl_LightModel.ambient * gl_FrontMaterial.ambient;
+}
+\end{cppcode}
+
+The fragment shader will then calculate the lighting more or less like
+the fixed function pipeline does, except its per pixel, and a few
+minor differences.
+
+\begin{cppcode}
+void main(void) {
+    color = GlobalAmbient + Ambient;
+    
+    vec3 n = normalize(Normal); // it's interpolated, we need to normalize it!
+    float NdotL = max(dot(n, normalize(LightDir)), 0.0);
+    if (NdotL > 0.0) {
+        float att = 1.0 / 
+        (gl_LightSource[0].constantAttenuation +
+        gl_LightSource[0].linearAttenuation * LightDistance + 
+        gl_LightSource[0].quadraticAttenuation * LightDistance * LightDistance);
+        color += att * Diffuse * NdotL;
+        vec3 halfV = normalize(HalfVector);
+        float NdotHV = max(dot(n, halfV), 0.0);
+        color += att * gl_FrontMaterial.specular 
+        * gl_LightSource[0].specular
+        * pow(NdotHV, gl_FrontMaterial.shininess);
+    }
+
+    color *= shadow;
+    color.a = 1.0;
+
+}
+\end{cppcode}
 
 \subsection{Limitations}
 
@@ -307,13 +358,17 @@ Therefor shadow mapping wont work with point light sources if they are
 placed between objects. A way to fix this would be to render multiple
 shadow maps per light source, but that makes it more expensive.
 
-\todoPtx{more limits}
+Another problem is that the quality of the shadows are based on the
+resolution of the texture, and the distance to the light.
 
 \subsection{Future Work}
 
 This implementation only supports one light source, having more would
 be a easy and useful extension.
 
+There are also a number of papers about how to improve the quality
+when the light source are far away. It could be interesting to
+implement one of these e.g. \citep{casc}.
 
 %%% Local Variables: 
 %%% mode: latex
