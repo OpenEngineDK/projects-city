@@ -1,15 +1,18 @@
-uniform sampler2DShadow ttex;
-//uniform sampler2D ttex;
 
-varying vec2 uv;
-varying vec4 shadowCoord;
+uniform sampler2DShadow ShadowMap;
+uniform float ShadowAmount;
 
-void main(void) {
- 
-    float depth = shadow2DProj(ttex, shadowCoord).x;
-    if (depth < 1.0)
-        gl_FragColor.r = 1.0;
+varying vec4 ShadowCoord;
 
-    //gl_FragColor.r = texture2D(ttex, uv).x;
 
+void main() {
+	float distanceFromLight = shadow2DProj(ShadowMap,ShadowCoord).r;
+    float shadow = 1.0;
+    if (distanceFromLight < 1.0)
+        shadow = ShadowAmount;
+
+
+
+  	gl_FragColor =	 shadow * gl_Color;
+    
 }
