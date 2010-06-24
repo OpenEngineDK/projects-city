@@ -127,13 +127,13 @@ The only assumption we make before running the ambient occlusion code
 is that a scene has been rendered and the resulting image reside in
 the backbuffer. The contents of the back buffer is stored in a texture
 for later use by the following code
-\cppcode{
+\begin{lstlisting}
   glBindTexture(GL_TEXTURE_2D, scene);
   CHECK_FOR_GL_ERROR();
   glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
   CHECK_FOR_GL_ERROR();
   glBindTexture(GL_TEXTURE_2D, 0);
-}
+\end{lstlisting}
 
 \paragraph{Collecting normals and depth values.}  
 The previous assumption makes it possible to overlay an arbitrary
