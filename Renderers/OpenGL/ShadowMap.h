@@ -55,7 +55,6 @@ class ShadowMap : public RenderingView{
     void MakeMap2(RenderingEventArg arg);
     void MakeMap(RenderingEventArg arg);
 
-    void drawObjects(RenderingEventArg);
     void drawLightFrustum();
     void drawThumb(RenderingEventArg);
 

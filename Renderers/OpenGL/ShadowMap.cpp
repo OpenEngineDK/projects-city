@@ -91,12 +91,6 @@ void ShadowMap::generateShadowFBO(RenderingEventArg arg) {
 }
 
 
-void ShadowMap::drawObjects(RenderingEventArg arg) {
-
-    arg.canvas.GetScene()->Accept(*this); return;
-	
-	
-}
 
 void ShadowMap::setTextureMatrix() {
     
@@ -106,19 +100,18 @@ void ShadowMap::setTextureMatrix() {
                         .0, .5, .0,  .0,
                         .0, .0, .5,  .0,
                         .5, .5, .5, 1.0);
+    //B.Transpose();
     Matrix<4,4,float> Vl = vv->GetViewMatrix();
+    //Vl.Transpose();
     Matrix<4,4,float> Pl = vv->GetProjectionMatrix();
+    //Pl.Transpose();
     
     Matrix<4,4,float> T = Vl*Pl*B; // The order is reversed T = B*Pl*Vl 
+    //Matrix<4,4,float> T = B*Pl*Vl; // The order is reversed T = B*Pl*Vl 
                                    // M is implicit (we add M in VisitTransformationNode)
-    
-
-    
-
+    //T.Transpose();
     float T_arr[16];
     T.ToArray(T_arr);
-
-
 	
 	glMatrixMode(GL_TEXTURE);
 	glActiveTextureARB(GL_TEXTURE7);	
@@ -140,9 +133,6 @@ void ShadowMap::Initialize(RenderingEventArg arg) {
         Create("projects/city/shaders/Shadow2.glsl");
     shadowShader->SetTexture("ShadowMap",fb->GetDepthTexture());
     shadowShader->SetUniform("ShadowAmount",shadowAmount);
-    //shadowShader->SetUniform("SkyColor",skyColor);
-    //shadowShader->SetUniform("GroundColor",groundColor);
-    //shadowShader->SetUniform("LightPosition",light->lightCam->GetPosition());
     shadowShader->Load();
 
 }
@@ -154,44 +144,49 @@ void ShadowMap::MakeMap(RenderingEventArg arg) {
     int h = arg.canvas.GetHeight();
 
 
+
     glEnable(GL_DEPTH_TEST);
 	glClearColor(0,0,0,1.0f);
 	glEnable(GL_CULL_FACE);
     CHECK_FOR_GL_ERROR();
 
-	//glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
-    glBindTexture(GL_TEXTURE_2D,fb->GetDepthTexture()->GetID());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
+    //First step: Render from the light POV to a FBO, story depth values only
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,fb->GetID());	//Rendering offscreen
 
+    //Using the fixed pipeline to render to the depthbuffer
+    glUseProgramObjectARB(0);
 
-	//First step: Render from the light POV to a FBO, story depth values only
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,fb->GetID());	//Rendering offscreen
-	
-	//Using the fixed pipeline to render to the depthbuffer
-	glUseProgramObjectARB(0);
-	
-	// In the case we render the shadowmap to a higher resolution, the viewport must be modified accordingly.
-	glViewport(0,0,w * SHADOW_MAP_RATIO,h* SHADOW_MAP_RATIO);
-	
-	// Clear previous frame values
-	glClear( GL_DEPTH_BUFFER_BIT);
-	
-	//Disable color rendering, we only want to write to the Z-Buffer
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); 
+    // In the case we render the shadowmap to a higher resolution, the
+    // viewport must be modified accordingly.
+    glViewport(0, 0,
+               w * SHADOW_MAP_RATIO,
+               h * SHADOW_MAP_RATIO);
 
+    // Clear previous frame values
+    glClear( GL_DEPTH_BUFFER_BIT);
 
+    //Disable color rendering, we only want to write to the Z-Buffer
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); 
+
+    // We offset the polygons to avoid self shadowing
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(poff, punits);
-	
-    
+
+    // Apply the viewingvolume (modelview and projection)
     arg.renderer.ApplyViewingVolume(*(light->lightCam));
-	//setupMatrices(p_light[0],p_light[1],p_light[2],l_light[0],l_light[1],l_light[2]);
-	
-	// Culling switching, rendering only backface, this is done to avoid self-shadowing
-	glCullFace(GL_FRONT);
-	drawObjects(arg);
-	
+
+    // Culling switching, rendering only backface, also to avoid self-shadowing
+    glCullFace(GL_FRONT);
+
+    // Draw the scene
+    arg.canvas.GetScene()->Accept(*this); return;
+
+    // Remember to reset some of the state!
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glDisable(GL_CULL_FACE);
     CHECK_FOR_GL_ERROR();
+
+
 }
 
 void ShadowMap::Handle(RenderingEventArg arg) {
@@ -209,8 +204,9 @@ void ShadowMap::Handle(RenderingEventArg arg) {
         return;
     } else if (arg.renderer.GetCurrentStage() != IRenderer::RENDERER_PROCESS)
         return;
-
+    
     MakeMap(arg);
+
 
 	//Save modelview/projection matrice into texture7, also add a biais
 	setTextureMatrix();
@@ -234,15 +230,19 @@ void ShadowMap::Handle(RenderingEventArg arg) {
     light->lightTrans->SetPosition(light->lightCam->GetPosition());
 		
     arg.renderer.ApplyViewingVolume(*(arg.canvas.GetViewingVolume()));
+    
 
-    glDisable(GL_POLYGON_OFFSET_FILL);
+    glBindTexture(GL_TEXTURE_2D,fb->GetDepthTexture()->GetID());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
+
+
 
     if (shadowsEnabled) {
         shadowShader->SetUniform("ShadowAmount", shadowAmount);
         shadowShader->ApplyShader();
     }
    
-	drawObjects(arg);
+    arg.canvas.GetScene()->Accept(*this); return;
 
     if (shadowsEnabled)
         shadowShader->ReleaseShader();
@@ -255,8 +255,10 @@ void ShadowMap::Handle(RenderingEventArg arg) {
     glDisable(GL_CULL_FACE);
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    glEnable(GL_TEXTURE_2D);
+
     if (showFrustum) drawLightFrustum();
-    if (showThumb) drawThumb(arg);
+    if (1 || showThumb) drawThumb(arg);
 }    
 void ShadowMap::drawThumb(RenderingEventArg arg) {
     int w = arg.canvas.GetWidth();
@@ -275,7 +277,7 @@ void ShadowMap::drawThumb(RenderingEventArg arg) {
     glBindTexture(GL_TEXTURE_2D,fb->GetDepthTexture()->GetID());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE);
     
-
+    
     glEnable(GL_TEXTURE_2D);
     glTranslated(0,0,-1);    
 
