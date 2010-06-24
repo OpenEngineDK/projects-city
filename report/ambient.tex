@@ -116,7 +116,43 @@ $\mathbf{P}$. This is done in the following way.
 \subsection{Implementation}
 
 We have implemented a variant of the horizon-based ambient occlusion
-using a bilinear blending strategy for smoothing the ao map
+using a simple gaussian blur kernel for smoothing the ao map. The
+algorithm is divided into a number of stages represented by a specific
+shader program for each stage. Some of these stages could be collapsed
+into a single shader but we have chosen this strategy in order to
+toggle each phase on and off at run-time. In the following we list the
+different stages comprising our ambient occlusion effect.
+
+The only assumption we make before running the ambient occlusion code
+is that a scene has been rendered and the resulting image reside in
+the backbuffer. The contents of the back buffer is stored in a texture
+for later use by the following code
+\cppcode{
+  glBindTexture(GL_TEXTURE_2D, scene);
+  CHECK_FOR_GL_ERROR();
+  glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
+  CHECK_FOR_GL_ERROR();
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+\paragraph{Collecting normals and depth values.}  
+The previous assumption makes it possible to overlay an arbitrary
+scene with ambient occlusion. This also means that we have to generate
+all the surface normals and depth values in a pre-renderphase. We do
+this by traversing the scene graph and rendering all scene geometry
+with the normal shader applied.  \todo{describe normal shader}
+
+\paragraph{Producing the ambient occlusion map.}  
+When the surface normals and the depth buffer have been obtained in
+textures we can now proceed with the actual ambient occlusion
+algorithm. The algorithm is written in a single shader and operates on
+every pixel in the normal and depth textures. In order to activate the
+shader we initialize OpenGL to orthographic projection, push the
+identity matrix on the model view stack, and simply draw a quad
+covering the entire screen.
+
+\paragraph{Bluring the ambient occlusion map.}
+
 
 \subsection{Results}
 Demo!
