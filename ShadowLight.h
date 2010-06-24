@@ -14,17 +14,20 @@
 #include <Display/Camera.h>
 #include <Display/PerspectiveViewingVolume.h>
 #include <Scene/TransformationNode.h>
+#include <Geometry/Light.h>
 
 using namespace OpenEngine::Display;
 using namespace OpenEngine::Scene;
+using namespace OpenEngine::Geometry;
 
 class ShadowLight {
 public:
     Camera* lightCam;
     PerspectiveViewingVolume* lightPersp;
     TransformationNode* lightTrans;
+    Light *light;
 
-    ShadowLight(Camera* lc, PerspectiveViewingVolume* p, TransformationNode* t);
+    ShadowLight(Camera* lc, PerspectiveViewingVolume* p, TransformationNode* t, Light* l);
 };
 
 

@@ -86,7 +86,7 @@ void ShadowMap::generateShadowFBO(RenderingEventArg arg) {
     IRenderer& renderer = arg.renderer;
     Vector<2,int> dims(shadowMapWidth,shadowMapHeight);
 
-    fb = new FrameBuffer(dims,1,true);
+    fb = new FrameBuffer(dims,0,true);
     renderer.BindFrameBuffer(fb);
 }
 
@@ -149,27 +149,12 @@ void ShadowMap::Initialize(RenderingEventArg arg) {
 
 void ShadowMap::MakeMap2(RenderingEventArg arg) {}
 
-void ShadowMap::MakeMap(RenderingEventArg arg) {}
-
-void ShadowMap::Handle(RenderingEventArg arg) {
-
-    CHECK_FOR_GL_ERROR();
-
+void ShadowMap::MakeMap(RenderingEventArg arg) {
     int w = arg.canvas.GetWidth();
     int h = arg.canvas.GetHeight();
 
 
-    this->arg = &arg;
-
-    if (arg.renderer.GetCurrentStage() == IRenderer::RENDERER_INITIALIZE) {
-        logger.info << "initialize NOW!" << logger.end;
-        Initialize(arg);
-        return;
-    } else if (arg.renderer.GetCurrentStage() != IRenderer::RENDERER_PROCESS)
-        return;
-
-    
-	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 	glClearColor(0,0,0,1.0f);
 	glEnable(GL_CULL_FACE);
     CHECK_FOR_GL_ERROR();
@@ -206,8 +191,28 @@ void ShadowMap::Handle(RenderingEventArg arg) {
 	glCullFace(GL_FRONT);
 	drawObjects(arg);
 	
-	//Save modelview/projection matrice into texture7, also add a biais
+    CHECK_FOR_GL_ERROR();
+}
 
+void ShadowMap::Handle(RenderingEventArg arg) {
+    CHECK_FOR_GL_ERROR();
+
+    int w = arg.canvas.GetWidth();
+    int h = arg.canvas.GetHeight();
+
+
+    this->arg = &arg;
+
+    if (arg.renderer.GetCurrentStage() == IRenderer::RENDERER_INITIALIZE) {
+        logger.info << "initialize NOW!" << logger.end;
+        Initialize(arg);
+        return;
+    } else if (arg.renderer.GetCurrentStage() != IRenderer::RENDERER_PROCESS)
+        return;
+
+    MakeMap(arg);
+
+	//Save modelview/projection matrice into texture7, also add a biais
 	setTextureMatrix();
 
     // Step 2
@@ -233,16 +238,11 @@ void ShadowMap::Handle(RenderingEventArg arg) {
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     if (shadowsEnabled) {
-         shadowShader->SetUniform("ShadowAmount", shadowAmount);
-        // shadowShader->SetUniform("SkyColor",skyColor);
-        // shadowShader->SetUniform("GroundColor",groundColor);
-
+        shadowShader->SetUniform("ShadowAmount", shadowAmount);
         shadowShader->ApplyShader();
     }
    
-    //this->ignoreMaterial = true;
 	drawObjects(arg);
-    //this->ignoreMaterial = false;	
 
     if (shadowsEnabled)
         shadowShader->ReleaseShader();
@@ -262,34 +262,10 @@ void ShadowMap::drawThumb(RenderingEventArg arg) {
     int w = arg.canvas.GetWidth();
     int h = arg.canvas.GetHeight();
 
-    // OrthogonalViewingVolume volume(1,10,0,w,0,h);
-    // arg.renderer.ApplyViewingVolume(volume);
-    // //glBindTexture(GL_TEXTURE_2D, fb->GetDepthTexture()->GetID());
-    // glBindTexture(GL_TEXTURE_2D, depthTextureId);
-    // glActiveTextureARB(GL_TEXTURE0);
-    // glEnable(GL_TEXTURE_2D);
-
-    // glColor4f(1,1,1,1);
-    // glDisable(GL_LIGHTING);
-    // glDisable(GL_COLOR_MATERIAL);
-    
-
-    // glTranslated(0,0,1);    
-
-    // Quad(w/2,h/2);
-    
-    // glBindTexture(GL_TEXTURE_2D, 0);
-    // glDisable(GL_TEXTURE_2D);
-
-    // return ;
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-w/2,w/2,
-            -h/2,h/2,
-            1,20);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    OrthogonalViewingVolume volume(1, 10,
+                                   -w/2, w/2,
+                                   h/2, -h/2);
+    arg.renderer.ApplyViewingVolume(volume);
 
     glColor4f(1,1,1,1);
     glDisable(GL_LIGHTING);
@@ -444,33 +420,35 @@ ValueList ShadowMap::Inspection() {
                                                &ShadowMap::SetPolygonUnits);
         v->name = "polygonunits";
         values.push_back(v);
-    }
-    /* Sky Color */ {
-        RWValueCall<ShadowMap, Vector<3,float> > *v
-            = new RWValueCall<ShadowMap, Vector<3,float> >
-            (*this,
-             &ShadowMap::GetSkyColor,
-             &ShadowMap::SetSkyColor);
-        v->name = "skycolor";
-        v->isColor = true;
-        values.push_back(v);
-    }
-    /* Ground Color */ {
-        RWValueCall<ShadowMap, Vector<3,float> > *v
-            = new RWValueCall<ShadowMap, Vector<3,float> >
-            (*this,
-             &ShadowMap::GetGroundColor,
-             &ShadowMap::SetGroundColor);
-        v->name = "groundcolor";
-        v->isColor = true;
-        values.push_back(v);
-    }
+    }    
+    // /* Sky Color */ {
+    //     RWValueCall<ShadowMap, Vector<3,float> > *v
+    //         = new RWValueCall<ShadowMap, Vector<3,float> >
+    //         (*this,
+    //          &ShadowMap::GetSkyColor,
+    //          &ShadowMap::SetSkyColor);
+    //     v->name = "skycolor";
+    //     v->isColor = true;
+    //     values.push_back(v);
+    // }
+    // /* Ground Color */ {
+    //     RWValueCall<ShadowMap, Vector<3,float> > *v
+    //         = new RWValueCall<ShadowMap, Vector<3,float> >
+    //         (*this,
+    //          &ShadowMap::GetGroundColor,
+    //          &ShadowMap::SetGroundColor);
+    //     v->name = "groundcolor";
+    //     v->isColor = true;
+    //     values.push_back(v);
+    // }
 
-    ValueList lightI = Inspect(light->lightCam);
+    ValueList lightCI = Inspect(light->lightCam);
     ValueList perspI = Inspect(light->lightPersp);
 
-    values.merge(lightI);
+
+    values.merge(lightCI);
     values.merge(perspI);
+
 
     return values;
 }

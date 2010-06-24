@@ -1,9 +1,10 @@
 #include "ShadowLight.h"
 
-ShadowLight::ShadowLight(Camera* lc, PerspectiveViewingVolume* p, TransformationNode* t)
+ShadowLight::ShadowLight(Camera* lc, PerspectiveViewingVolume* p, TransformationNode* t, Light* l)
     : lightCam(lc),
       lightPersp(p),
-      lightTrans(t) {
+      lightTrans(t),
+      light(l) {
     
     
       }

@@ -30,8 +30,6 @@
 #include "CityAnimator.h"
 #include <Utils/InspectionBar.h>
 
-#include <Utils/InspectionBar.h>
-
 //#include <Utils/FPSSurface.h>
 #include <Display/InterpolatedViewingVolume.h>
 #include <Display/PerspectiveViewingVolume.h>
@@ -56,6 +54,7 @@
 
 #include <Utils/RenderStateNodeInspector.h>
 #include <Utils/TransformationNodeInspector.h>
+#include <Utils/LightInspector.h>
 #include <Utils/CameraInspector.h>
 #include <Utils/PerspectiveViewingVolumeInspector.h>
 
@@ -219,7 +218,7 @@ int main(int argc, char** argv) {
     lightTrans->AddNode(ln);
 
 
-    ShadowLight *sl = new ShadowLight(lc, persp,lightTrans);   
+    ShadowLight *sl = new ShadowLight(lc, persp,lightTrans,ln);
     ShadowMap* sm = new ShadowMap(sl);
 
    
@@ -326,6 +325,7 @@ int main(int argc, char** argv) {
     atb->AddBar(new InspectionBar("thingy",Inspect(thingyTrans)));
     atb->AddBar(new InspectionBar("shadow",Inspect(sm)));
     atb->AddBar(new InspectionBar("renderer",Inspect(rsn)));
+    atb->AddBar(new InspectionBar("light",Inspect(ln)));
 
     setup->GetKeyboard().KeyEvent().Attach(*(new RenderStateHandler(*rsn)));
 
