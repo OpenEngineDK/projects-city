@@ -35,11 +35,10 @@ To create the shadow map, the light sources need a bit more
 information than usually. Regular lights in OpenGL have properties
 that describes the amount of light emitted, and the placement of the
 light source. This is not enough, as we need to create a project to be
-able to render the scene from the light. \todoPtx{omskriv?}
+able to render the scene from the light.
 
-Because of this, a light sources is more like a camera, which gives us
-a nice abstraction. \todoPtx{complete me}
-
+Because of this, we use a mix of a camera and a light to describe each
+light source. 
 
 \subsection{Creating the Shadow map}
 
@@ -47,10 +46,9 @@ The first part of the algorithm is to create the shadow map. This is
 done by rendering the scene using the light source as the camera, and
 extracting the depth buffer.
 
-\todoPtx{Husk at implementere det} The only interesting information is
-the depth, so the rendering can be speed up be disabling textures,
-lighting, colors and more. Its also convenient to disable front faces
-to avoid self-shadowing. % bla bla?
+The only interesting information is the depth, so the rendering can be
+speed up be disabling textures, lighting, colors and more. Its also
+convenient to disable front faces to avoid self-shadowing. % bla bla?
 
 \begin{figure}[h]
   \centering
@@ -103,7 +101,7 @@ depth of the shadow map, and the coordinates $z$-component. When the
 value in the shadow map is largest, it means that something is closer
 to the light source, than the fragment we are processing.
 
-\todoPtx{Kunne skrives bedre...}
+
 Now we know if the fragment is in shadow, and change the color
 to visualise it.
 
@@ -300,8 +298,9 @@ the fixed functions, so we need to implement our own lighting.
 
 \subsection{Limitations}
 
-Shadow mapping is a technique for adding shadows in projection based \todoPtx{fixy?}
-3D rendering. As such, it is limited by what is possible with projections.
+Shadow mapping is a technique for adding shadows in projection based
+3D rendering. As such, it is limited by what is possible with
+projections.
 
 One of these is that we cant have a field of view larger than 180
 Therefor shadow mapping wont work with point light sources if they are

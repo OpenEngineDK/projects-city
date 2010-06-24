@@ -1,0 +1,69 @@
+
+\section{Running and Files}
+
+The code have been tested on \texttt{faugeras}, and should compile and
+run using the \texttt{MAKE} and \texttt{RUN} files. To build and run
+on a non-daimi machine, use \texttt{make.py} instead of \texttt{MAKE}.
+
+% This project depends on:
+
+% \begin{itemize}
+% \item SDL
+% \item SDLImage
+% \item GLEW
+% \item boost
+% \item cmake
+% \end{itemize}
+
+\subsection{Running}
+
+Controlling the program is done using a set of inspector bars. By
+default these are minimized, and show up as small squares in the lower
+left corner. Clicking them will expand the inspector.
+
+The keys \texttt{w,a,s,d} controls the placement of the camera, and
+dragging the mouse with the left button down rotates it. Pressing
+\texttt{1} or \texttt{2} selected weather to move the camera, or the
+light source.
+
+By default, shadow mapping is on, while ambient occlusion is
+off. Ambient Occlusion can be enabled in the ambient occlusion
+inspector.
+
+\subsection{Files}
+
+A few notes about the many files in the project.
+
+First a list of the most important directories:
+
+\begin{center} 
+  \begin{tabular}{|l|l|}
+    \hline 
+    \textbf{Directory} & \textbf{Description} \\ \hline 
+    \texttt{src/} & The core parts of OpenEngine. \\ \hline
+    \texttt{extensions/} & Extensions to OpenEngine, e.g. the OpenGL renderer. \\ \hline
+    \texttt{projects/city/} & The files specific for this project. \\ \hline
+  \end{tabular}
+\end{center}
+
+In the \texttt{projects/city/} directory, the following files are of interest:
+
+\begin{center} 
+  \begin{tabular}{|l|p{5cm}|}
+    \hline 
+    \textbf{File} & \textbf{Description} \\ \hline 
+    \texttt{shaders/Shadow2.glsl.\{frag,vert\}} 
+    & The fragment and vertex shader for the shadow map \\ \hline
+    \texttt{Renderers/OpenGL/ShadowMap.cpp} 
+    & This is the renderer, it extends the default OpenGL Renderer. (see note) \\ \hline    
+  \end{tabular}
+\end{center}
+
+Note: the default renderer is in \\
+\texttt{extensions/OpenGLRenderer/Renderers/OpenGL/Renderer.cpp}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

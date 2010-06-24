@@ -361,7 +361,7 @@ ValueList ShadowMap::Inspection() {
             = new RWValueCall<ShadowMap, bool>(*this,
                                                &ShadowMap::GetShadowsEnabled,
                                                &ShadowMap::SetShadowsEnabled);
-        v->name = "shadows";
+        v->name = "enabled";
         values.push_back(v);
     }
     /* Show Frustum */ {
