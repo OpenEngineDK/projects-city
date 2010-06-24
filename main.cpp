@@ -28,9 +28,7 @@
 
 #include "City.h"
 #include "CityAnimator.h"
-#include "InspectorBar.h"
-
-#include "InspectorBar.h"
+#include <Utils/InspectionBar.h>
 
 #include <Utils/InspectionBar.h>
 
@@ -56,7 +54,10 @@
 #include <Utils/ToolChain.h>
 #include <Utils/MouseSelection.h>
 
+#include <Utils/RenderStateNodeInspector.h>
 #include <Utils/TransformationNodeInspector.h>
+#include <Utils/CameraInspector.h>
+#include <Utils/PerspectiveViewingVolumeInspector.h>
 
 #include "Renderers/OpenGL/AmbientOcclusion.h"
 #include "Renderers/OpenGL/ShadowMap.h"
@@ -66,6 +67,8 @@
 #include "Echo.h"
 //#include "MainUI.h"
 #include "IRCCity.h"
+
+#include "ShadowLight.h"
 
 // name spaces that we will be using.
 // this combined with the above imports is almost the same as
