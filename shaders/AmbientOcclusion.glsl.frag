@@ -6,7 +6,7 @@ uniform mat4 proj;
 uniform mat4 unproj;
 
 uniform float sphereRad;
-//uniform float linearAtt;
+uniform float linearAtt;
 uniform float contrast;
 uniform float rays;
 uniform float steps;
@@ -58,7 +58,7 @@ void main(void)
         for (float j = 0.0; j < steps; j = j + 1.0) {
             pos += stepRay;
             vec3 new = unproject(pos, shadow2D(d, vec3(win2uv(pos), 0.0)).x);
-            if (new.z < horizon.z) {
+            if (new.z > horizon.z) {
                 horizon = new;
             }
         }
@@ -76,9 +76,9 @@ void main(void)
         float tAngle = atan(tan.z / length(tan.xy)) + bias;
         
         // final ao contribution of this direction
-        ao += (sin(hAngle) - sin(tAngle));// * linearAtt * (1.0 - r * r);
+        ao += (sin(hAngle) - sin(tAngle)) * min((linearAtt*r),1.0);
     }
 
     // average ao and multiply with contrast
-    gl_FragColor = vec4(1.0 - (ao/rays) * contrast);
+    gl_FragColor = min(vec4(1.0 - (ao/rays) * contrast),1.0);
 }
