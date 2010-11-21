@@ -284,8 +284,8 @@ void ShadowMap::drawLightFrustum() {
     glMultMatrixf(f);
     CHECK_FOR_GL_ERROR();
 
-    float near = light->lightPersp->GetNear();
-    float far = light->lightPersp->GetFar();
+    float nearlight = light->lightPersp->GetNear();
+    float farlight = light->lightPersp->GetFar();
 
     float right,left,top,bottom;
     float fright,fleft,ftop,fbottom;
@@ -295,40 +295,40 @@ void ShadowMap::drawLightFrustum() {
     ty = tan(t);
     tx = ty * light->lightPersp->GetAspect();
     
-    right = tx*near;
+    right = tx*nearlight;
     left = -right;
-    top = ty*near;
+    top = ty*nearlight;
     bottom = -top;
 
 
-    fright = tx*far;
+    fright = tx*farlight;
     fleft = -fright;
-    ftop = ty*far;
+    ftop = ty*farlight;
     fbottom = -ftop;
 
-    near = -near;
-    far = -far;
+    nearlight = -nearlight;
+    farlight = -farlight;
     
 	glBegin(GL_LINE_LOOP);
-    glVertex3f(left,bottom,near);
-    glVertex3f(left,top,near);
-    glVertex3f(right,top,near);
-    glVertex3f(right,bottom,near);
+    glVertex3f(left,bottom,nearlight);
+    glVertex3f(left,top,nearlight);
+    glVertex3f(right,top,nearlight);
+    glVertex3f(right,bottom,nearlight);
     glEnd();
 
 	glBegin(GL_LINE_LOOP);
-    glVertex3f(fleft,fbottom,far);
-    glVertex3f(fleft,ftop,far);
-    glVertex3f(fright,ftop,far);
-    glVertex3f(fright,fbottom,far);
+    glVertex3f(fleft,fbottom,farlight);
+    glVertex3f(fleft,ftop,farlight);
+    glVertex3f(fright,ftop,farlight);
+    glVertex3f(fright,fbottom,farlight);
     glEnd();
     
     
     glBegin(GL_LINES);
-    glVertex3f(left,bottom,near);     glVertex3f(fleft,fbottom,far);   
-    glVertex3f(left,top,near);        glVertex3f(fleft,ftop,far);      
-    glVertex3f(right,top,near);       glVertex3f(fright,ftop,far);     
-    glVertex3f(right,bottom,near);    glVertex3f(fright,fbottom,far);  
+    glVertex3f(left,bottom,nearlight);     glVertex3f(fleft,fbottom,farlight);   
+    glVertex3f(left,top,nearlight);        glVertex3f(fleft,ftop,farlight);      
+    glVertex3f(right,top,nearlight);       glVertex3f(fright,ftop,farlight);     
+    glVertex3f(right,bottom,nearlight);    glVertex3f(fright,fbottom,farlight);  
                                      
     glEnd();
 
