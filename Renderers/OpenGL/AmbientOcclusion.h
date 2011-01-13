@@ -14,6 +14,7 @@
 #include <Scene/ISceneNodeVisitor.h>
 #include <Resources/IShaderResource.h>
 #include <Meta/OpenGL.h>
+#include <Math/RandomGenerator.h>
 
 namespace OpenEngine {
     namespace Scene {
@@ -26,6 +27,7 @@ namespace OpenGL {
 using Scene::ISceneNodeVisitor;
 using Scene::MeshNode;
 using Scene::TransformationNode;
+using Math::RandomGenerator;
 using Resources::IShaderResourcePtr;
 
 class AmbientOcclusion 
@@ -52,6 +54,8 @@ private:
 
     bool enabled, doBlur, doNormals, merge;
     float radius, linearAtt, contrast, rays, bias, steps;
+
+    RandomGenerator gen;
 
     void Initialize(RenderingEventArg arg);
 

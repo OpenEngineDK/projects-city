@@ -11,6 +11,7 @@ uniform float contrast;
 uniform float rays;
 uniform float steps;
 uniform float bias;
+uniform float rand;
 
 const float PI = 3.14159265;
 
@@ -33,52 +34,67 @@ vec2 project(vec3 pos) {
     return res.xy / res.w;
 }
 
+float att(float r) {
+    /* if (r > 1.0) return 0.0; */
+    return 1.0 / r*r*linearAtt;
+}
+
 void main(void)
 {
-    const float offsetAngle = PI/10.0;
-    float distAngle = (2.0*PI) / rays;
-    vec4 sample = texture2D(normals,uv);
-    
     vec2 winPos  = uv2win(uv); // window coordinates [-1;1]
     float depth  = shadow2D(d, vec3(uv,0.0)).x;
-    vec3 normal  = normalize(sample.xyz);
+    vec3 normal  = normalize(texture2D(normals,uv).xyz);
     vec3 fragPos = unproject(winPos, depth);
 
     float circleRad = length(winPos - project(fragPos + vec3(sphereRad, 0.0, 0.0))); // project the sphere radius onto the screen
-    float stepSize = circleRad / steps;
+    float stepSize = circleRad / steps; 
     
     float ao = 0.0; 
     // calculate the horizon for each ray
+    float baseAngle = 2.0*PI*rand;
+    float stepAngle = (2.0*PI) / rays;
+    float angle = baseAngle;
     for (float i = 0.0; i < rays; i = i + 1.0) {
-        float angle = offsetAngle + distAngle * i;
-        vec2 stepRay = vec2(cos(angle), sin(angle));
-        stepRay = stepRay * stepSize;
-        vec3 horizon = fragPos;
-        vec2 pos = winPos;        
-        for (float j = 0.0; j < steps; j = j + 1.0) {
-            pos += stepRay;
-            vec3 new = unproject(pos, shadow2D(d, vec3(win2uv(pos), 0.0)).x);
-            if (new.z > horizon.z) {
-                horizon = new;
-            }
-        }
-        horizon = horizon - fragPos;
+        vec2 stepRay = vec2(cos(angle)*stepSize, sin(angle)*stepSize);
+        vec2 pos = winPos + stepRay;  
+        vec2 maxPos = pos;
+        float maxDepth = shadow2D(d, vec3(win2uv(pos), 0.0)).x;
+
+        vec3 horizon = unproject(maxPos, maxDepth) - fragPos;
         float r = length(horizon) / sphereRad; 
 
         // calculate tangent to the surface normal
-        horizon = normalize(horizon);
-        vec3 tan   = vec3(1,0,0);
-        vec3 bitan = normalize(cross(normal, tan));
-        tan        = normalize(cross(bitan, normal));
+        vec3 tang  = normalize(horizon);
+        vec3 bitan = cross(normal, tang);
+        tang       = cross(bitan, normal);
 
         // calculate angles in [-PI; PI]
+        float tAngle = atan(tang.z / length(tang.xy)) + bias;
         float hAngle = atan(horizon.z / length(horizon.xy));
-        float tAngle = atan(tan.z / length(tan.xy)) + bias;
         
         // final ao contribution of this direction
-        ao += (sin(hAngle) - sin(tAngle)) * min((linearAtt*r),1.0);
+        float pao = sin(hAngle) - sin(tAngle);
+        ao +=  pao * att(r);
+                     
+        for (float j = 1.0; j < steps; j = j + 1.0) {
+            pos += stepRay;
+            float d = shadow2D(d, vec3(win2uv(pos), 0.0)).x;
+            vec3 s = unproject(pos, d) - fragPos;
+            float a = atan(s.z / length(s.xy));
+            if (a > hAngle) {
+                maxDepth = d;
+                maxPos = pos;
+                horizon = unproject(maxPos, maxDepth) - fragPos;
+                r = length(horizon) / sphereRad; 
+                hAngle = atan(horizon.z / length(horizon.xy));
+                float nao = sin(hAngle) - sin(tAngle);
+                ao += (nao - pao) * min(att(r), 1.0);
+                pao = nao;
+            }
+        }
+        angle += stepAngle;
     }
 
     // average ao and multiply with contrast
-    gl_FragColor = min(vec4(1.0 - (ao/rays) * contrast),1.0);
+    gl_FragColor.r = max(min(1.0 - (ao/rays) * contrast,1.0),0.0);
 }

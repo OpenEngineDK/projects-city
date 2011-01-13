@@ -148,7 +148,7 @@ namespace OpenEngine {
                     v->name = "linear attenuation";
                     v->properties[MIN] = 0;
                     v->properties[MAX] = 1;
-                    v->properties[STEP] = 0.1;
+                    v->properties[STEP] = 0.0001;
                     values.push_back(v);
                 }
                 {
@@ -196,7 +196,7 @@ namespace OpenEngine {
                     v->name = "angle bias";
                     v->properties[MIN] = 0;
                     v->properties[MAX] = Math::PI;
-                    v->properties[STEP] = 0.1;
+                    v->properties[STEP] = 0.01;
                     values.push_back(v);
                 }
                 return values;    

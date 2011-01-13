@@ -37,15 +37,15 @@ namespace OpenGL {
           enabled(false),
           doBlur(false),
           doNormals(false),
-          merge(true),
-          radius(2.5),
-          linearAtt(0.8),
-          contrast(0.7),
+          merge(false),
+          radius(2.0),
+          linearAtt(0.5),
+          contrast(1.0),
           rays(8.0),
-          bias(Math::PI / 10.0),
+          bias(0.01),
           steps(4.0)
     {
-
+        gen.SeedWithTime();
     }
     
     AmbientOcclusion::~AmbientOcclusion() {
@@ -415,6 +415,7 @@ namespace OpenGL {
         aoShader->SetUniform("rays", rays);
         aoShader->SetUniform("bias", bias);
         aoShader->SetUniform("steps", steps);
+        aoShader->SetUniform("rand", gen.UniformFloat(0.0,1.0));
 
         glClearColor(1.0,1.0,1.0,1.0);
         glClear( GL_COLOR_BUFFER_BIT);
