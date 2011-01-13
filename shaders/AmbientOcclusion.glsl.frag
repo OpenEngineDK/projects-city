@@ -36,7 +36,7 @@ vec2 project(vec3 pos) {
 
 float att(float r) {
     /* if (r > 1.0) return 0.0; */
-    return 1.0 / r*r*linearAtt;
+    return 1.0 - (1.0 / r*r*linearAtt);
 }
 
 void main(void)
@@ -61,7 +61,7 @@ void main(void)
         float maxDepth = shadow2D(d, vec3(win2uv(pos), 0.0)).x;
 
         vec3 horizon = unproject(maxPos, maxDepth) - fragPos;
-        float r = length(horizon) / sphereRad; 
+        float r = length(horizon);// / sphereRad; 
 
         // calculate tangent to the surface normal
         vec3 tang  = normalize(horizon);
@@ -88,7 +88,7 @@ void main(void)
                 r = length(horizon) / sphereRad; 
                 hAngle = atan(horizon.z / length(horizon.xy));
                 float nao = sin(hAngle) - sin(tAngle);
-                ao += (nao - pao) * min(att(r), 1.0);
+                ao += (nao - pao) * max(att(r), 0.0);
                 pao = nao;
             }
         }
