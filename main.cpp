@@ -287,7 +287,7 @@ int main(int argc, char** argv) {
     thingyTrans->AddNode(thingyRes->GetSceneNode());
     thingyRes->Unload();
     root->AddNode(thingyTrans);
-    thingyTrans->SetRotation(Quaternion<float>(-PI/3.0, Vector<3,float>(1,0,0)));
+    //thingyTrans->SetRotation(Quaternion<float>(-PI/3.0, Vector<3,float>(1,0,0)));
 
 
 
