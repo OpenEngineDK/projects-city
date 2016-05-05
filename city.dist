@@ -2,15 +2,15 @@
 # http://www.openengine.dk/wiki/Projects/city
 
 # main repository
-darcs / http://openengine.dk/code/openengine
-darcs-dev / fh.daimi.au.dk:/users/cgd/code/openengine
+git / https://github.com/OpenEngineDK/openengine.git
+git-dev / git@github.com:OpenEngineDK/openengine.git
 
 # project repository
 # (uncomment the following two lines after uploading your project)
-darcs /projects/city http://openengine.dk/code/projects/city
-darcs-dev /projects/city fh.daimi.au.dk:/users/cgd/code/projects/city
+git /projects/city https://github.com/OpenEngineDK/projects-city.git
+git-dev /projects/city git@github.com:OpenEngineDK/projects-city.git
 
-#dist /extensions/GambitScheme/GambitScheme.dist http://openengine.dk/code/extensions/GambitScheme/GambitScheme.dist
+#dist /extensions/GambitScheme/GambitScheme.dist https://raw.githubusercontent.com/OpenEngineDK/extensions-GambitScheme/master/GambitScheme.dist
 dist /extensions/Assimp/Assimp.dist               http://www.openengine.dk/code/extensions/Assimp/Assimp.dist
 dist /extensions/AntTweakBar/AntTweakBar.dist     http://www.openengine.dk/code/extensions/AntTweakBar/AntTweakBar.dist
 dist /extensions/Inspection/Inspection.dist       http://www.openengine.dk/code/extensions/Inspection/Inspection.dist
@@ -25,32 +25,32 @@ dist /extensions/OpenGLRenderer/OpenGLRenderer.dist http://www.openengine.dk/cod
 
 # required extensions
 
-darcs /extensions/ActionMappers          http://openengine.dk/code/extensions/ActionMappers
-darcs /extensions/SetupHelpers           http://openengine.dk/code/extensions/SetupHelpers
-darcs /extensions/HUD                    http://openengine.dk/code/extensions/HUD
-#darcs /extensions/TinyScheme             http://openengine.dk/code/extensions/TinyScheme
-darcs /extensions/FaceBuilder            http://openengine.dk/code/extensions/FaceBuilder
-#darcs /extensions/IRC                    http://openengine.dk/code/extensions/IRC
-#darcs /extensions/Qt                     http://openengine.dk/code/extensions/Qt
-darcs /extensions/MeshUtils              http://openengine.dk/code/extensions/MeshUtils
-#darcs /extensions/Sockets                http://openengine.dk/code/extensions/Sockets
-darcs /extensions/GenericHandlers        http://openengine.dk/code/extensions/GenericHandlers
-darcs /extensions/OpenGLSelection        http://openengine.dk/code/extensions/OpenGLSelection
-darcs /extensions/TGAResource            http://openengine.dk/code/extensions/TGAResource
-darcs /extensions/OBJResource            http://openengine.dk/code/extensions/OBJResource
-darcs /extensions/AccelerationStructures http://openengine.dk/code/extensions/AccelerationStructures
+git /extensions/ActionMappers          https://github.com/OpenEngineDK/extensions-ActionMappers.git
+git /extensions/SetupHelpers           https://github.com/OpenEngineDK/extensions-SetupHelpers.git
+git /extensions/HUD                    https://github.com/OpenEngineDK/extensions-HUD.git
+#git /extensions/TinyScheme             https://github.com/OpenEngineDK/extensions-TinyScheme.git
+git /extensions/FaceBuilder            https://github.com/OpenEngineDK/extensions-FaceBuilder.git
+#git /extensions/IRC                    https://github.com/OpenEngineDK/extensions-IRC.git
+#git /extensions/Qt                     https://github.com/OpenEngineDK/extensions-Qt.git
+git /extensions/MeshUtils              https://github.com/OpenEngineDK/extensions-MeshUtils.git
+#git /extensions/Sockets                https://github.com/OpenEngineDK/extensions-Sockets.git
+git /extensions/GenericHandlers        https://github.com/OpenEngineDK/extensions-GenericHandlers.git
+git /extensions/OpenGLSelection        https://github.com/OpenEngineDK/extensions-OpenGLSelection.git
+git /extensions/TGAResource            https://github.com/OpenEngineDK/extensions-TGAResource.git
+git /extensions/OBJResource            https://github.com/OpenEngineDK/extensions-OBJResource.git
+git /extensions/AccelerationStructures https://github.com/OpenEngineDK/extensions-AccelerationStructures.git
 
-darcs-dev /extensions/SetupHelpers           fh.daimi.au.dk:/users/cgd/code/extensions/SetupHelpers
-darcs-dev /extensions/HUD                    fh.daimi.au.dk:/users/cgd/code/extensions/HUD
-#darcs-dev /extensions/TinyScheme             fh.daimi.au.dk:/users/cgd/code/extensions/TinyScheme
-darcs-dev /extensions/FaceBuilder            fh.daimi.au.dk:/users/cgd/code/extensions/FaceBuilder
-#darcs-dev /extensions/IRC                    fh.daimi.au.dk:/users/cgd/code/extensions/IRC
-#darcs-dev /extensions/Sockets                fh.daimi.au.dk:/users/cgd/code/extensions/Sockets
-darcs-dev /extensions/OpenGLSelection        fh.daimi.au.dk:/users/cgd/code/extensions/OpenGLSelection
-darcs-dev /extensions/TGAResource            fh.daimi.au.dk:/users/cgd/code/extensions/TGAResource
-darcs-dev /extensions/OBJResource            fh.daimi.au.dk:/users/cgd/code/extensions/OBJResource
-darcs-dev /extensions/AccelerationStructures fh.daimi.au.dk:/users/cgd/code/extensions/AccelerationStructures
-darcs-dev /extensions/GenericHandlers        fh.daimi.au.dk:/users/cgd/code/extensions/GenericHandlers
+git-dev /extensions/SetupHelpers           git@github.com:OpenEngineDK/extensions-SetupHelpers.git
+git-dev /extensions/HUD                    git@github.com:OpenEngineDK/extensions-HUD.git
+#git-dev /extensions/TinyScheme             git@github.com:OpenEngineDK/extensions-TinyScheme.git
+git-dev /extensions/FaceBuilder            git@github.com:OpenEngineDK/extensions-FaceBuilder.git
+#git-dev /extensions/IRC                    git@github.com:OpenEngineDK/extensions-IRC.git
+#git-dev /extensions/Sockets                git@github.com:OpenEngineDK/extensions-Sockets.git
+git-dev /extensions/OpenGLSelection        git@github.com:OpenEngineDK/extensions-OpenGLSelection.git
+git-dev /extensions/TGAResource            git@github.com:OpenEngineDK/extensions-TGAResource.git
+git-dev /extensions/OBJResource            git@github.com:OpenEngineDK/extensions-OBJResource.git
+git-dev /extensions/AccelerationStructures git@github.com:OpenEngineDK/extensions-AccelerationStructures.git
+git-dev /extensions/GenericHandlers        git@github.com:OpenEngineDK/extensions-GenericHandlers.git
 
 # windows libraries
 win32 /libraries http://openengine.dk/data/libraries/boost-win32.zip
